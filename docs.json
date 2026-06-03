@@ -1,0 +1,73 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Continu Reporting API",
+  "colors": {
+    "primary": "#1F4E79",
+    "light": "#3B82F6",
+    "dark": "#0F2A47"
+  },
+  "favicon": "/favicon.svg",
+  "seo": {
+    "indexing": "navigable",
+    "metatags": {
+      "robots": "noindex, nofollow",
+      "googlebot": "noindex, nofollow"
+    }
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Guide",
+        "groups": [
+          {
+            "group": "Get started",
+            "pages": [
+              "introduction/welcome",
+              "introduction/quickstart"
+            ]
+          },
+          {
+            "group": "Core concepts",
+            "pages": [
+              "api-reference/authentication",
+              "api-reference/request-model",
+              "api-reference/date-handling",
+              "api-reference/rate-limits",
+              "api-reference/error-handling"
+            ]
+          },
+          {
+            "group": "Patterns",
+            "pages": [
+              "api-reference/sync-patterns"
+            ]
+          },
+          {
+            "group": "Downloads",
+            "pages": [
+              "downloads/index"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API reference",
+        "openapi": "openapi.json"
+      }
+    ]
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Support",
+        "href": "mailto:support@continu.co"
+      }
+    ]
+  },
+  "footer": {
+    "socials": {
+      "website": "https://continu.co"
+    }
+  }
+}

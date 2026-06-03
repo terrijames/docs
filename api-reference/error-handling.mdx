@@ -1,0 +1,88 @@
+---
+title: "Error handling"
+description: "HTTP status codes, message-string conventions, retry semantics."
+---
+
+The API returns standard HTTP status codes. **A critical convention to know:** for both `401` and `429`, the message body string is the discriminator that tells your client what actually went wrong. Several distinct conditions return the same status code with different message bodies.
+
+## Status codes
+
+<ResponseField name="200 OK" type="success">
+  Request processed. Response body is a JSON array of records.
+</ResponseField>
+
+<ResponseField name="400 Bad Request" type="error">
+  The request body is malformed. Most commonly: a field name typo, an invalid filter value, or a malformed nested object. Check the request body against the [API reference](/api-reference/content-&-engagement/content-engagement-signals) for that endpoint.
+</ResponseField>
+
+<ResponseField name="401 Unauthorized" type="error">
+  Several distinct causes — see Message-string discrimination below. Most importantly: only retry after re-issuing the token if the message starts with `"invalid token TTL Expired"`. Other 401 messages are not recoverable by retry.
+</ResponseField>
+
+<ResponseField name="403 Forbidden" type="error">
+  Token is valid but lacks access to the requested resource.
+</ResponseField>
+
+<ResponseField name="404 Not Found" type="error">
+  Endpoint not found. Check the URL path, including the trailing date params where required.
+</ResponseField>
+
+<ResponseField name="429 Too Many Requests" type="error">
+  Rate limit exceeded. Message body distinguishes per-minute vs. per-day — see Message-string discrimination below. No `Retry-After` header is set.
+</ResponseField>
+
+<ResponseField name="500 Internal Server Error" type="error">
+  Server error. Retry after a short delay. If it persists, contact support with the request body and timestamp.
+</ResponseField>
+
+## Message-string discrimination
+
+Some status codes cover multiple distinct conditions, distinguished only by the JSON message body:
+
+### 401 Unauthorized
+
+| Message body (prefix match) | Meaning | Retry strategy |
+|---|---|---|
+| `invalid token TTL Expired` | Token has passed its 30-day TTL | Request a new token, retry once |
+| `invalid header` | Missing or malformed `Authorization` header | Fix the header format; do not retry |
+| (decryption/format errors) | Token is malformed or wrong type | Verify the token; do not retry without resolution |
+| (role errors) | Token lacks API access | Contact support; do not retry |
+
+<Warning>
+  Match on the message **prefix**, exactly as shown (capital "E" in "Expired"). The message field is the only discriminator — there's no separate error code, header, or distinct status code.
+</Warning>
+
+### 429 Too Many Requests
+
+| Message body (prefix match) | Meaning | Retry strategy |
+|---|---|---|
+| `too many requests per minute, rate limit 50 exceeded 51` | Per-minute cap (50/min default) | Back off and retry — see [Rate limits](/api-reference/rate-limits) |
+| `too many requests today, rate limit 5000 exceeded 5001` | Daily cap (5,000/day default) | Wait until daily reset, or request a higher cap |
+
+The numeric values in the message (`50`, `5000`) reflect your company's actual configured caps, not the defaults.
+
+## Error response shape
+
+Error responses include a JSON body with a human-readable message:
+
+```json
+{
+  "message": "invalid filter field 'departent' on user_filter"
+}
+```
+
+Always log the full message body alongside the status code — for 4xx responses it's how you'll diagnose what specifically went wrong.
+
+## Idempotency
+
+All endpoints are read-only and safe to retry. Repeated calls with the same body and date range return the same data (modulo any new records that have landed between calls).
+
+## What to include when reporting an issue
+
+If you hit an error you can't resolve, contact [support@continu.co](mailto:support@continu.co) with:
+
+- The endpoint and request body (token **redacted**)
+- The full response, including status code and the message body
+- The `X-REQUESTS-PER-MINUTE` and `X-REQUESTS-PER-DAY` headers from the response (if present)
+- An approximate timestamp of the failing request
+- Your organization name or account contact

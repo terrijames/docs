@@ -1,0 +1,88 @@
+---
+title: "Request model"
+description: "Every request body is a field-selection document, not a query."
+---
+
+<Note>
+  The Reporting API uses an unusual pattern worth understanding before you write any code: **each request body is a field-selection document, not a query**. Read this section before building anything.
+</Note>
+
+Every report endpoint accepts a POST body where:
+
+- **Boolean flags** select which fields to include in the response. Set a field to `true` to include it; omit it or set to `false` to exclude it. Only requested fields are returned.
+- **Filter objects** narrow the result set. Filter values are typically comma-separated strings of IDs.
+- **Date range** lives in the URL path (`/{from}/{until}`) as Unix epoch seconds, not in the body.
+
+A single endpoint can return a slim report (a few fields) or a wide one (dozens of fields), depending on what your body requests. Request only the fields you need — narrower payloads are faster.
+
+## Example body shape
+
+```json
+{
+  "email": true,
+  "first_name": true,
+  "last_name": true,
+  "departments": true,
+  "content": true,
+  "assignment": true,
+  "user_filter": {
+    "departments": "5f8a1c2d4e6b7a9c0d1e2f3a,5f8a1c2d4e6b7a9c0d1e2f3b",
+    "locations": "5f8a1c2d4e6b7a9c0d1e2f4c"
+  },
+  "entity_filter": {
+    "entity_type": "course"
+  }
+}
+```
+
+## Filters
+
+Most endpoints accept one or both of:
+
+<AccordionGroup>
+  <Accordion title="user_filter — narrow by user attributes" icon="user">
+    Filter by departments, locations, groups, teams, grades, manager, job title, suspended state, etc. Values are typically Continu IDs as comma-separated strings; for boolean attributes (`suspended`, `is_manager`, etc.) use `"true"` / `"false"`.
+
+    Available fields (across endpoints): `buddy_email`, `departments`, `email`, `first_name`, `grades`, `groups`, `id`, `is_author`, `is_collaborator`, `is_manager`, `is_purchaser`, `last_name`, `locations`, `manager_email`, `org_levels`, `partner`, `role`, `suspended`, `teams`, `userid`.
+  </Accordion>
+
+  <Accordion title="entity_filter — narrow by primary entity" icon="cube">
+    Used on completion-style endpoints. Filter by `entity_id` and `entity_type` (e.g., `course`, `assessment`, `workshop`).
+  </Accordion>
+
+  <Accordion title="content_filter — narrow by content attributes" icon="file">
+    Used on content/workshop/track-style endpoints. Filter by `archived`, `categories`, `collaborators`, `content_id`, `created_by`, `departments`, `grades`, `locations`, `org_levels`, `teams`.
+  </Accordion>
+
+  <Accordion title="assignment_filter — narrow by assignment attributes" icon="paperclip">
+    Used on assignment endpoints. Filter by `assigner_id`, `assignment_id`, `content_id`.
+  </Accordion>
+</AccordionGroup>
+
+<Info>
+  Some report types use a custom filter name — `assessment-status` uses `assessment_filter`, `track-status` uses `track_filter`, `workshop-engagement` uses `workshop_filter`. The exact filter field set per endpoint is in the [API reference](/api-reference/content-&-engagement/content-engagement-signals) for that endpoint's request body.
+</Info>
+
+## Other body controls
+
+A few fields aren't field selectors or filters but control how the report is shaped:
+
+| Field | Purpose | Example |
+|---|---|---|
+| `range_target` | Which date field the `{from}/{until}` path range applies to | `"assigned_date"`, `"completed_date"`, `"created_at"` |
+| `sort_by` | Which field to sort the result set by | `"updated_date"` |
+| `unsuspended_from` / `unsuspended_to` | Epoch-second bounds for filtering by unsuspended date | `1714521600` |
+
+## Tips for building requests
+
+<Tip>
+  **Start with the [Postman collection](/downloads/index).** Every endpoint is pre-populated with all available field flags (defaulting to `false`) and filter scaffolding. Toggle on the fields you want — no guessing.
+</Tip>
+
+<Tip>
+  **Be conservative with field selection.** Narrow request bodies mean smaller responses and faster transfers. You can always add fields later — it's a body change, not a schema migration.
+</Tip>
+
+<Tip>
+  **Filter early.** Apply `user_filter` and `entity_filter` aggressively. The API returns the full unpaginated result set in one response, so filtering at request time keeps responses manageable.
+</Tip>

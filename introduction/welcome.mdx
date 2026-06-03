@@ -1,0 +1,49 @@
+---
+title: "Welcome"
+description: "The Continu Reporting API for engineering teams pulling learning and engagement data into their own systems."
+---
+
+This guide is for engineers building against the Continu Reporting API to pull learning and engagement data into your own systems — typically a data warehouse, BI tool, or internal reporting pipeline.
+
+The Reporting API is read-oriented: every endpoint returns a report based on a payload you POST. You select which fields you want returned, apply filters, and pass a date range — the API returns matching records as JSON.
+
+## What the API covers
+
+The Reporting API exposes analytical and learning-record data for your Continu organization:
+
+- Content completions and engagement
+- Assessment results and statuses
+- Assignments (content, journey, track)
+- User engagement and activity
+- SCORM completion records
+- Workshop attendance and engagement
+- Manager-rollup summaries
+
+<Info>
+  This API is **read-only and reporting-focused**. It does not handle user provisioning, content authoring, group management, or admin operations — those are not in scope for this integration.
+</Info>
+
+## How to use these docs
+
+<CardGroup cols={2}>
+  <Card title="Quick start" icon="rocket" href="/introduction/quickstart">
+    Get your first request running in under five minutes.
+  </Card>
+  <Card title="API reference" icon="code" href="/api-reference/content-&-engagement/content-engagement-signals">
+    Browse all 14 endpoints, request bodies, and response shapes.
+  </Card>
+  <Card title="Sync patterns" icon="arrows-rotate" href="/api-reference/sync-patterns">
+    Production-grade patterns for warehouse loads and incremental sync.
+  </Card>
+  <Card title="Downloads" icon="download" href="/downloads/index">
+    Postman collection and OpenAPI specs for direct tool import.
+  </Card>
+</CardGroup>
+
+## How to read each section
+
+The **Core concepts** pages walk through the things that are the same across every endpoint: how auth works, the unusual field-selection request model, date handling, rate limits, and error semantics. Read these once.
+
+The **API reference** tab is generated directly from the OpenAPI spec. Every endpoint has its own page with the full list of field flags, available filters, and a try-it-out playground.
+
+The **Patterns** section is the one your team will come back to most — concrete recommendations for warehouse syncs, backfills, handling updates and deletes, and field-selection strategy.

@@ -1,0 +1,640 @@
+{
+  "info": {
+    "name": "Continu Reporting API",
+    "description": "All 14 endpoints of the Continu Reporting API, organized by domain. Each request is pre-populated with the available field flags (most set to `false`; set the ones you want to `true`). Filter objects are scaffolded with every available field; fill in the ones you need.\n\n**Setup:**\n1. Set the `base_url` variable (default: `https://usw2-oapi.continu.co/api/v1`).\n2. Set the `api_token` variable to your Continu-issued token (just the token \u2014 the `Bearer` prefix is included in the request header template).\n3. For dated endpoints, set `from` and `until` to Unix epoch seconds (UTC).\n\n**Token notes:** Tokens have a 30-day TTL with no refresh endpoint. On expiry you'll get a 401 with body message `\"invalid token TTL Expired, unauthorized request\"` \u2014 request a new token from your Continu contact and retry.\n\n**Rate limits:** 50 requests per minute and 5,000 requests per day, both per company across all tokens. Check `X-REQUESTS-PER-MINUTE` and `X-REQUESTS-PER-DAY` response headers for current usage (these are consumed counts, not remaining).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "continu"
+  },
+  "item": [
+    {
+      "name": "Content & completion",
+      "item": [
+        {
+          "name": "Content completion records",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"address\": false,\n  \"assignment\": false,\n  \"buddy_email\": false,\n  \"content\": false,\n  \"content_metadata\": false,\n  \"created_at\": false,\n  \"departments\": false,\n  \"distributor\": false,\n  \"email\": true,\n  \"first_login\": false,\n  \"first_name\": true,\n  \"grade\": false,\n  \"group\": false,\n  \"groups\": false,\n  \"hired_on\": false,\n  \"image\": false,\n  \"is_collaborator\": false,\n  \"is_manager\": false,\n  \"is_purchaser\": false,\n  \"job_title\": false,\n  \"journey\": false,\n  \"language\": false,\n  \"last_login\": false,\n  \"last_name\": true,\n  \"locations\": false,\n  \"manager_email\": false,\n  \"org_level\": false,\n  \"partner\": false,\n  \"partner_name\": false,\n  \"region\": false,\n  \"role\": false,\n  \"suspended\": false,\n  \"suspended_on\": false,\n  \"teams\": false,\n  \"track\": false,\n  \"user_metadata\": false,\n  \"userid\": false,\n  \"entity_filter\": {\n    \"entity_id\": \"\",\n    \"entity_type\": \"\"\n  },\n  \"range_target\": \"\",\n  \"sort_by\": \"\",\n  \"user_filter\": {\n    \"buddy_email\": \"\",\n    \"departments\": \"\",\n    \"email\": \"\",\n    \"first_name\": \"\",\n    \"grades\": \"\",\n    \"groups\": \"\",\n    \"id\": \"\",\n    \"is_author\": \"\",\n    \"is_collaborator\": \"\",\n    \"is_manager\": \"\",\n    \"is_purchaser\": \"\",\n    \"last_name\": \"\",\n    \"locations\": \"\",\n    \"manager_email\": \"\",\n    \"org_levels\": \"\",\n    \"partner\": \"\",\n    \"role\": \"\",\n    \"suspended\": \"\",\n    \"teams\": \"\",\n    \"userid\": \"\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/reports/content-completion/{{from}}/{{until}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reports",
+                "content-completion",
+                "{{from}}",
+                "{{until}}"
+              ]
+            },
+            "description": "**Content completion records**\n\nPer-completion records (one row per user-content completion) in the date range. Use for warehouse loads of completion history.\n\n**Request body**: see the body tab. Set field flags to `true` to include them in the response. Provide values inside `user_filter` / etc. to narrow results.\n\n**Path dates** (required): Unix epoch seconds in UTC."
+          },
+          "response": []
+        },
+        {
+          "name": "User content completions (user-centric)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"address\": false,\n  \"assignment\": false,\n  \"buddy_email\": false,\n  \"content\": false,\n  \"content_metadata\": false,\n  \"created_at\": false,\n  \"departments\": false,\n  \"distributor\": false,\n  \"email\": true,\n  \"first_login\": false,\n  \"first_name\": true,\n  \"grade\": false,\n  \"group\": false,\n  \"groups\": false,\n  \"hired_on\": false,\n  \"image\": false,\n  \"is_collaborator\": false,\n  \"is_manager\": false,\n  \"is_purchaser\": false,\n  \"job_title\": false,\n  \"journey\": false,\n  \"language\": false,\n  \"last_login\": false,\n  \"last_name\": true,\n  \"locations\": false,\n  \"manager_email\": false,\n  \"org_level\": false,\n  \"partner\": false,\n  \"partner_name\": false,\n  \"region\": false,\n  \"role\": false,\n  \"suspended\": false,\n  \"suspended_on\": false,\n  \"teams\": false,\n  \"track\": false,\n  \"user_metadata\": false,\n  \"userid\": false,\n  \"content_filter\": {\n    \"content_id\": \"\",\n    \"content_type\": \"\"\n  },\n  \"range_target\": \"\",\n  \"sort_by\": \"\",\n  \"user_filter\": {\n    \"buddy_email\": \"\",\n    \"departments\": \"\",\n    \"email\": \"\",\n    \"first_name\": \"\",\n    \"grades\": \"\",\n    \"groups\": \"\",\n    \"id\": \"\",\n    \"is_author\": \"\",\n    \"is_collaborator\": \"\",\n    \"is_manager\": \"\",\n    \"is_purchaser\": \"\",\n    \"last_name\": \"\",\n    \"locations\": \"\",\n    \"manager_email\": \"\",\n    \"org_levels\": \"\",\n    \"partner\": \"\",\n    \"role\": \"\",\n    \"suspended\": \"\",\n    \"teams\": \"\",\n    \"userid\": \"\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/reports/user-content/{{from}}/{{until}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reports",
+                "user-content",
+                "{{from}}",
+                "{{until}}"
+              ]
+            },
+            "description": "**User content completions (user-centric)**\n\nSame record domain as content-completion, organized for user-centric queries.\n\n**Request body**: see the body tab. Set field flags to `true` to include them in the response. Provide values inside `user_filter` / etc. to narrow results.\n\n**Path dates** (required): Unix epoch seconds in UTC."
+          },
+          "response": []
+        },
+        {
+          "name": "Content engagement signals",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"archived\": false,\n  \"assignments_completed\": false,\n  \"assignments_pending\": false,\n  \"comments\": false,\n  \"created_at\": false,\n  \"created_by\": false,\n  \"creator\": false,\n  \"creator_email\": false,\n  \"creator_first_name\": false,\n  \"creator_image\": false,\n  \"creator_is_manager\": false,\n  \"creator_job_title\": false,\n  \"creator_last_name\": false,\n  \"creator_userid\": false,\n  \"id\": false,\n  \"in_track_title\": false,\n  \"likes\": false,\n  \"linked_categories\": false,\n  \"metadata\": false,\n  \"on_explore\": false,\n  \"privacy_collaborators\": false,\n  \"privacy_departments\": false,\n  \"privacy_grade\": false,\n  \"privacy_locations\": false,\n  \"privacy_org_level\": false,\n  \"privacy_teams\": false,\n  \"published\": false,\n  \"ratings\": false,\n  \"ratings_average\": false,\n  \"shares\": false,\n  \"tags\": false,\n  \"title\": false,\n  \"type\": false,\n  \"updated_at\": false,\n  \"url\": false,\n  \"views\": false,\n  \"content_filter\": {\n    \"archived\": \"\",\n    \"categories\": \"\",\n    \"collaborators\": \"\",\n    \"content_id\": \"\",\n    \"created_by\": \"\",\n    \"departments\": \"\",\n    \"grades\": \"\",\n    \"locations\": \"\",\n    \"org_levels\": \"\",\n    \"teams\": \"\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/reports/content-engagement/{{from}}/{{until}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reports",
+                "content-engagement",
+                "{{from}}",
+                "{{until}}"
+              ]
+            },
+            "description": "**Content engagement signals**\n\nReturns one record per content item with full metadata (id, title, type, published, created_at, tags, in_track_title, archived, views, likes, ratings, etc.). Works as both an engagement report and a published-content catalog \u2014 content records are returned regardless of whether anyone has engaged with them.\n\n**Request body**: see the body tab. Set field flags to `true` to include them in the response. Provide values inside `user_filter` / etc. to narrow results.\n\n**Path dates** (required): Unix epoch seconds in UTC."
+          },
+          "response": []
+        },
+        {
+          "name": "User engagement signals",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"address\": false,\n  \"assignments_completed\": false,\n  \"assignments_pending\": false,\n  \"buddy_email\": false,\n  \"comments\": false,\n  \"created_at\": false,\n  \"departments\": false,\n  \"distributor\": false,\n  \"email\": true,\n  \"first_login\": false,\n  \"first_name\": true,\n  \"grade\": false,\n  \"group\": false,\n  \"groups\": false,\n  \"hired_on\": false,\n  \"image\": false,\n  \"is_collaborator\": false,\n  \"is_manager\": false,\n  \"is_purchaser\": false,\n  \"job_title\": false,\n  \"language\": false,\n  \"last_login\": false,\n  \"last_name\": true,\n  \"likes\": false,\n  \"locations\": false,\n  \"manager_email\": false,\n  \"org_level\": false,\n  \"partner\": false,\n  \"partner_name\": false,\n  \"ratings\": false,\n  \"ratings_average\": false,\n  \"region\": false,\n  \"role\": false,\n  \"seconds_viewed\": false,\n  \"sessions\": false,\n  \"shares\": false,\n  \"suspended\": false,\n  \"suspended_on\": false,\n  \"teams\": false,\n  \"tracks_completed\": false,\n  \"tracks_started\": false,\n  \"user_metadata\": false,\n  \"userid\": false,\n  \"views\": false,\n  \"workshops_attended\": false,\n  \"user_filter\": {\n    \"buddy_email\": \"\",\n    \"departments\": \"\",\n    \"email\": \"\",\n    \"first_name\": \"\",\n    \"grades\": \"\",\n    \"groups\": \"\",\n    \"id\": \"\",\n    \"is_author\": \"\",\n    \"is_collaborator\": \"\",\n    \"is_manager\": \"\",\n    \"is_purchaser\": \"\",\n    \"last_name\": \"\",\n    \"locations\": \"\",\n    \"manager_email\": \"\",\n    \"org_levels\": \"\",\n    \"partner\": \"\",\n    \"role\": \"\",\n    \"suspended\": \"\",\n    \"teams\": \"\",\n    \"userid\": \"\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/reports/user-engagement/{{from}}/{{until}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reports",
+                "user-engagement",
+                "{{from}}",
+                "{{until}}"
+              ]
+            },
+            "description": "**User engagement signals**\n\nEngagement signals organized per user. Use for activity dashboards and identifying inactive users.\n\n**Request body**: see the body tab. Set field flags to `true` to include them in the response. Provide values inside `user_filter` / etc. to narrow results.\n\n**Path dates** (required): Unix epoch seconds in UTC."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Assignments",
+      "item": [
+        {
+          "name": "Assignment summary",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"address\": false,\n  \"assigned_date\": false,\n  \"assignee_metadata\": false,\n  \"assigner\": false,\n  \"assigner_email\": false,\n  \"assigner_first_name\": false,\n  \"assigner_image\": false,\n  \"assigner_is_manager\": false,\n  \"assigner_is_purchaser\": false,\n  \"assigner_is_suspended\": false,\n  \"assigner_job_title\": false,\n  \"assigner_last_name\": false,\n  \"assigner_userid\": false,\n  \"assignment_id\": false,\n  \"assignment_status\": false,\n  \"buddy_email\": false,\n  \"completed_date\": false,\n  \"content_archived\": false,\n  \"content_completed_on\": false,\n  \"content_id\": false,\n  \"content_metadata\": false,\n  \"content_title\": false,\n  \"content_type\": false,\n  \"created_at\": false,\n  \"departments\": false,\n  \"distributor\": false,\n  \"due_date\": false,\n  \"email\": true,\n  \"first_login\": false,\n  \"first_name\": true,\n  \"grade\": false,\n  \"group\": false,\n  \"groups\": false,\n  \"hired_on\": false,\n  \"image\": false,\n  \"is_collaborator\": false,\n  \"is_manager\": false,\n  \"is_purchaser\": false,\n  \"job_title\": false,\n  \"language\": false,\n  \"last_login\": false,\n  \"last_name\": true,\n  \"locations\": false,\n  \"manager_email\": false,\n  \"manual_completed_by\": false,\n  \"manual_completed_by_email\": false,\n  \"manual_completed_by_first_name\": false,\n  \"manual_completed_by_image\": false,\n  \"manual_completed_by_is_manager\": false,\n  \"manual_completed_by_is_suspended\": false,\n  \"manual_completed_by_job_title\": false,\n  \"manual_completed_by_last_name\": false,\n  \"manual_completed_by_userid\": false,\n  \"org_level\": false,\n  \"partner\": false,\n  \"partner_name\": false,\n  \"region\": false,\n  \"role\": false,\n  \"suspended\": false,\n  \"teams\": false,\n  \"updated_date\": false,\n  \"userid\": false,\n  \"assignment_filter\": {\n    \"assigner_id\": \"\",\n    \"assignment_id\": \"\",\n    \"content_id\": \"\"\n  },\n  \"range_target\": \"\",\n  \"user_filter\": {\n    \"buddy_email\": \"\",\n    \"departments\": \"\",\n    \"email\": \"\",\n    \"first_name\": \"\",\n    \"grades\": \"\",\n    \"groups\": \"\",\n    \"id\": \"\",\n    \"is_author\": \"\",\n    \"is_collaborator\": \"\",\n    \"is_manager\": \"\",\n    \"is_purchaser\": \"\",\n    \"last_name\": \"\",\n    \"locations\": \"\",\n    \"manager_email\": \"\",\n    \"org_levels\": \"\",\n    \"partner\": \"\",\n    \"role\": \"\",\n    \"suspended\": \"\",\n    \"teams\": \"\",\n    \"userid\": \"\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/reports/assignment-summary/{{from}}/{{until}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reports",
+                "assignment-summary",
+                "{{from}}",
+                "{{until}}"
+              ]
+            },
+            "description": "**Assignment summary**\n\nSummary of assignments created, due, or completed in the date range. Includes per-record content_id, content_title, assigner info, and completion status.\n\n**Request body**: see the body tab. Set field flags to `true` to include them in the response. Provide values inside `user_filter` / etc. to narrow results.\n\n**Path dates** (required): Unix epoch seconds in UTC."
+          },
+          "response": []
+        },
+        {
+          "name": "Assignments pivoted by content",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"assignee\": false,\n  \"assigner\": false,\n  \"manual_completed_by\": false,\n  \"content_filter\": {\n    \"archived\": \"\",\n    \"categories\": \"\",\n    \"collaborators\": \"\",\n    \"content_id\": \"\",\n    \"created_by\": \"\",\n    \"departments\": \"\",\n    \"grades\": \"\",\n    \"locations\": \"\",\n    \"org_levels\": \"\",\n    \"teams\": \"\"\n  },\n  \"range_target\": \"\",\n  \"user_filter\": {\n    \"buddy_email\": \"\",\n    \"departments\": \"\",\n    \"email\": \"\",\n    \"first_name\": \"\",\n    \"grades\": \"\",\n    \"groups\": \"\",\n    \"id\": \"\",\n    \"is_author\": \"\",\n    \"is_collaborator\": \"\",\n    \"is_manager\": \"\",\n    \"is_purchaser\": \"\",\n    \"last_name\": \"\",\n    \"locations\": \"\",\n    \"manager_email\": \"\",\n    \"org_levels\": \"\",\n    \"partner\": \"\",\n    \"role\": \"\",\n    \"suspended\": \"\",\n    \"teams\": \"\",\n    \"userid\": \"\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/reports/pivoted-content-assignments/{{from}}/{{until}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reports",
+                "pivoted-content-assignments",
+                "{{from}}",
+                "{{until}}"
+              ]
+            },
+            "description": "**Assignments pivoted by content**\n\nAssignments pivoted by content (rows are content items, columns include assignment counts).\n\n**Request body**: see the body tab. Set field flags to `true` to include them in the response. Provide values inside `user_filter` / etc. to narrow results.\n\n**Path dates** (required): Unix epoch seconds in UTC."
+          },
+          "response": []
+        },
+        {
+          "name": "Assignments pivoted by user",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"all_assignments\": false,\n  \"content_filter\": {\n    \"archived\": \"\",\n    \"categories\": \"\",\n    \"collaborators\": \"\",\n    \"content_id\": \"\",\n    \"created_by\": \"\",\n    \"departments\": \"\",\n    \"grades\": \"\",\n    \"locations\": \"\",\n    \"org_levels\": \"\",\n    \"teams\": \"\"\n  },\n  \"range_target\": \"\",\n  \"unsuspended_from\": \"\",\n  \"unsuspended_to\": \"\",\n  \"user_filter\": {\n    \"buddy_email\": \"\",\n    \"departments\": \"\",\n    \"email\": \"\",\n    \"first_name\": \"\",\n    \"grades\": \"\",\n    \"groups\": \"\",\n    \"id\": \"\",\n    \"is_author\": \"\",\n    \"is_collaborator\": \"\",\n    \"is_manager\": \"\",\n    \"is_purchaser\": \"\",\n    \"last_name\": \"\",\n    \"locations\": \"\",\n    \"manager_email\": \"\",\n    \"org_levels\": \"\",\n    \"partner\": \"\",\n    \"role\": \"\",\n    \"suspended\": \"\",\n    \"teams\": \"\",\n    \"userid\": \"\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/reports/pivoted-user-assignments/{{from}}/{{until}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reports",
+                "pivoted-user-assignments",
+                "{{from}}",
+                "{{until}}"
+              ]
+            },
+            "description": "**Assignments pivoted by user**\n\nAssignments pivoted by user (rows are users, columns include their assignment statuses).\n\n**Request body**: see the body tab. Set field flags to `true` to include them in the response. Provide values inside `user_filter` / etc. to narrow results.\n\n**Path dates** (required): Unix epoch seconds in UTC."
+          },
+          "response": []
+        },
+        {
+          "name": "Simplified current-state assignment list",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"assignee\": false,\n  \"assigner\": false,\n  \"manual_completed_by\": false,\n  \"sort_by\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/reports/simplified/assignments",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reports",
+                "simplified",
+                "assignments"
+              ]
+            },
+            "description": "**Simplified current-state assignment list**\n\nLightweight current-state assignment list (no date range).\n\n**Request body**: see the body tab. Set field flags to `true` to include them in the response. Provide values inside `user_filter` / etc. to narrow results.\n\n**Path dates** (not used): Unix epoch seconds in UTC."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Assessments",
+      "item": [
+        {
+          "name": "Assessment status",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"address\": false,\n  \"assessment_attempts\": false,\n  \"assessment_completed_date\": false,\n  \"assessment_id\": false,\n  \"assessment_score\": false,\n  \"assessment_started_date\": false,\n  \"assessment_status\": false,\n  \"assessment_title\": false,\n  \"buddy_email\": false,\n  \"containing_journey\": false,\n  \"containing_journey_id\": false,\n  \"containing_track\": false,\n  \"containing_track_id\": false,\n  \"created_at\": false,\n  \"departments\": false,\n  \"distributor\": false,\n  \"email\": true,\n  \"first_login\": false,\n  \"first_name\": true,\n  \"grade\": false,\n  \"group\": false,\n  \"groups\": false,\n  \"hired_on\": false,\n  \"image\": false,\n  \"is_collaborator\": false,\n  \"is_manager\": false,\n  \"is_purchaser\": false,\n  \"job_title\": false,\n  \"language\": false,\n  \"last_login\": false,\n  \"last_name\": true,\n  \"locations\": false,\n  \"manager_email\": false,\n  \"org_level\": false,\n  \"partner\": false,\n  \"partner_name\": false,\n  \"region\": false,\n  \"role\": false,\n  \"suspended\": false,\n  \"suspended_on\": false,\n  \"teams\": false,\n  \"user_metadata\": false,\n  \"userid\": false,\n  \"assessment_filter\": {\n    \"archived\": \"\",\n    \"categories\": \"\",\n    \"collaborators\": \"\",\n    \"content_id\": \"\",\n    \"created_by\": \"\",\n    \"departments\": \"\",\n    \"grades\": \"\",\n    \"locations\": \"\",\n    \"org_levels\": \"\",\n    \"teams\": \"\"\n  },\n  \"user_filter\": {\n    \"buddy_email\": \"\",\n    \"departments\": \"\",\n    \"email\": \"\",\n    \"first_name\": \"\",\n    \"grades\": \"\",\n    \"groups\": \"\",\n    \"id\": \"\",\n    \"is_author\": \"\",\n    \"is_collaborator\": \"\",\n    \"is_manager\": \"\",\n    \"is_purchaser\": \"\",\n    \"last_name\": \"\",\n    \"locations\": \"\",\n    \"manager_email\": \"\",\n    \"org_levels\": \"\",\n    \"partner\": \"\",\n    \"role\": \"\",\n    \"suspended\": \"\",\n    \"teams\": \"\",\n    \"userid\": \"\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/reports/assessment-status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reports",
+                "assessment-status"
+              ]
+            },
+            "description": "**Assessment status**\n\nPer-user-per-assessment status (started, completed, score, attempts).\n\n**Request body**: see the body tab. Set field flags to `true` to include them in the response. Provide values inside `user_filter` / etc. to narrow results.\n\n**Path dates** (not used): Unix epoch seconds in UTC."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Tracks & journeys",
+      "item": [
+        {
+          "name": "Track status",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"address\": false,\n  \"buddy_email\": false,\n  \"containing_journey\": false,\n  \"containing_journey_id\": false,\n  \"created_at\": false,\n  \"departments\": false,\n  \"distributor\": false,\n  \"email\": true,\n  \"first_login\": false,\n  \"first_name\": true,\n  \"grade\": false,\n  \"group\": false,\n  \"groups\": false,\n  \"hired_on\": false,\n  \"image\": false,\n  \"is_collaborator\": false,\n  \"is_manager\": false,\n  \"is_purchaser\": false,\n  \"job_title\": false,\n  \"language\": false,\n  \"last_login\": false,\n  \"last_name\": true,\n  \"locations\": false,\n  \"manager_email\": false,\n  \"manual_completed_by\": false,\n  \"manual_completed_by_email\": false,\n  \"manual_completed_by_first_name\": false,\n  \"manual_completed_by_image\": false,\n  \"manual_completed_by_is_manager\": false,\n  \"manual_completed_by_job_title\": false,\n  \"manual_completed_by_last_name\": false,\n  \"manual_completed_by_userid\": false,\n  \"org_level\": false,\n  \"partner\": false,\n  \"partner_name\": false,\n  \"region\": false,\n  \"role\": false,\n  \"suspended\": false,\n  \"suspended_on\": false,\n  \"teams\": false,\n  \"track_completed_date\": false,\n  \"track_id\": false,\n  \"track_progress\": false,\n  \"track_status\": false,\n  \"track_title\": false,\n  \"user_metadata\": false,\n  \"userid\": false,\n  \"range_target\": \"\",\n  \"track_filter\": {\n    \"archived\": \"\",\n    \"categories\": \"\",\n    \"collaborators\": \"\",\n    \"content_id\": \"\",\n    \"created_by\": \"\",\n    \"departments\": \"\",\n    \"grades\": \"\",\n    \"locations\": \"\",\n    \"org_levels\": \"\",\n    \"teams\": \"\"\n  },\n  \"user_filter\": {\n    \"buddy_email\": \"\",\n    \"departments\": \"\",\n    \"email\": \"\",\n    \"first_name\": \"\",\n    \"grades\": \"\",\n    \"groups\": \"\",\n    \"id\": \"\",\n    \"is_author\": \"\",\n    \"is_collaborator\": \"\",\n    \"is_manager\": \"\",\n    \"is_purchaser\": \"\",\n    \"last_name\": \"\",\n    \"locations\": \"\",\n    \"manager_email\": \"\",\n    \"org_levels\": \"\",\n    \"partner\": \"\",\n    \"role\": \"\",\n    \"suspended\": \"\",\n    \"teams\": \"\",\n    \"userid\": \"\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/reports/track-status/{{from}}/{{until}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reports",
+                "track-status",
+                "{{from}}",
+                "{{until}}"
+              ]
+            },
+            "description": "**Track status**\n\nPer-user-per-track progress and completion status.\n\n**Request body**: see the body tab. Set field flags to `true` to include them in the response. Provide values inside `user_filter` / etc. to narrow results.\n\n**Path dates** (required): Unix epoch seconds in UTC."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "SCORM",
+      "item": [
+        {
+          "name": "SCORM status",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"address\": false,\n  \"buddy_email\": false,\n  \"containing_journey\": false,\n  \"containing_journey_id\": false,\n  \"containing_track\": false,\n  \"containing_track_id\": false,\n  \"created_at\": false,\n  \"departments\": false,\n  \"distributor\": false,\n  \"email\": true,\n  \"first_login\": false,\n  \"first_name\": true,\n  \"grade\": false,\n  \"group\": false,\n  \"groups\": false,\n  \"hired_on\": false,\n  \"image\": false,\n  \"is_collaborator\": false,\n  \"is_manager\": false,\n  \"is_purchaser\": false,\n  \"job_title\": false,\n  \"language\": false,\n  \"last_login\": false,\n  \"last_name\": true,\n  \"locations\": false,\n  \"manager_email\": false,\n  \"manual_completed_by\": false,\n  \"manual_completed_by_email\": false,\n  \"manual_completed_by_first_name\": false,\n  \"manual_completed_by_image\": false,\n  \"manual_completed_by_is_manager\": false,\n  \"manual_completed_by_job_title\": false,\n  \"manual_completed_by_last_name\": false,\n  \"manual_completed_by_userid\": false,\n  \"org_level\": false,\n  \"partner\": false,\n  \"partner_name\": false,\n  \"region\": false,\n  \"role\": false,\n  \"scorm_id\": false,\n  \"scorm_last_updated_date\": false,\n  \"scorm_started_date\": false,\n  \"scorm_status\": false,\n  \"scorm_title\": false,\n  \"suspended\": false,\n  \"suspended_on\": false,\n  \"teams\": false,\n  \"user_metadata\": false,\n  \"userid\": false,\n  \"range_target\": \"\",\n  \"scorm_filter\": {\n    \"archived\": \"\",\n    \"categories\": \"\",\n    \"collaborators\": \"\",\n    \"content_id\": \"\",\n    \"created_by\": \"\",\n    \"departments\": \"\",\n    \"grades\": \"\",\n    \"locations\": \"\",\n    \"org_levels\": \"\",\n    \"teams\": \"\"\n  },\n  \"user_filter\": {\n    \"buddy_email\": \"\",\n    \"departments\": \"\",\n    \"email\": \"\",\n    \"first_name\": \"\",\n    \"grades\": \"\",\n    \"groups\": \"\",\n    \"id\": \"\",\n    \"is_author\": \"\",\n    \"is_collaborator\": \"\",\n    \"is_manager\": \"\",\n    \"is_purchaser\": \"\",\n    \"last_name\": \"\",\n    \"locations\": \"\",\n    \"manager_email\": \"\",\n    \"org_levels\": \"\",\n    \"partner\": \"\",\n    \"role\": \"\",\n    \"suspended\": \"\",\n    \"teams\": \"\",\n    \"userid\": \"\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/reports/scorm-status/{{from}}/{{until}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reports",
+                "scorm-status",
+                "{{from}}",
+                "{{until}}"
+              ]
+            },
+            "description": "**SCORM status**\n\nSCORM-specific completion and status data.\n\n**Request body**: see the body tab. Set field flags to `true` to include them in the response. Provide values inside `user_filter` / etc. to narrow results.\n\n**Path dates** (required): Unix epoch seconds in UTC."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Workshops",
+      "item": [
+        {
+          "name": "Workshop engagement",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"archived\": false,\n  \"canceled_registrations\": false,\n  \"host_name\": false,\n  \"offered_seats\": false,\n  \"registered_seats\": false,\n  \"registration_disabled\": false,\n  \"total_absentees\": false,\n  \"total_attendees\": false,\n  \"total_waiting\": false,\n  \"waitlist_enabled\": false,\n  \"waitlist_seats\": false,\n  \"workshop_duration\": false,\n  \"workshop_end_date\": false,\n  \"workshop_id\": false,\n  \"workshop_instance_id\": false,\n  \"workshop_start_date\": false,\n  \"workshop_status\": false,\n  \"workshop_title\": false,\n  \"workshop_filter\": {\n    \"archived\": \"\",\n    \"categories\": \"\",\n    \"collaborators\": \"\",\n    \"content_id\": \"\",\n    \"created_by\": \"\",\n    \"departments\": \"\",\n    \"grades\": \"\",\n    \"locations\": \"\",\n    \"org_levels\": \"\",\n    \"teams\": \"\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/reports/workshop-engagement/{{from}}/{{until}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reports",
+                "workshop-engagement",
+                "{{from}}",
+                "{{until}}"
+              ]
+            },
+            "description": "**Workshop engagement**\n\nWorkshop engagement signals (attendance, participation) in the date range.\n\n**Request body**: see the body tab. Set field flags to `true` to include them in the response. Provide values inside `user_filter` / etc. to narrow results.\n\n**Path dates** (required): Unix epoch seconds in UTC."
+          },
+          "response": []
+        },
+        {
+          "name": "Workshop status",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"address\": false,\n  \"buddy_email\": false,\n  \"created_at\": false,\n  \"departments\": false,\n  \"distributor\": false,\n  \"email\": true,\n  \"first_login\": false,\n  \"first_name\": true,\n  \"grade\": false,\n  \"group\": false,\n  \"groups\": false,\n  \"hired_on\": false,\n  \"image\": false,\n  \"is_collaborator\": false,\n  \"is_manager\": false,\n  \"is_purchaser\": false,\n  \"job_title\": false,\n  \"language\": false,\n  \"last_login\": false,\n  \"last_name\": true,\n  \"locations\": false,\n  \"manager_email\": false,\n  \"org_level\": false,\n  \"partner\": false,\n  \"partner_name\": false,\n  \"region\": false,\n  \"role\": false,\n  \"suspended\": false,\n  \"suspended_on\": false,\n  \"teams\": false,\n  \"user_metadata\": false,\n  \"userid\": false,\n  \"workshop_duration\": false,\n  \"workshop_end_date\": false,\n  \"workshop_id\": false,\n  \"workshop_instance_id\": false,\n  \"workshop_start_date\": false,\n  \"workshop_status\": false,\n  \"workshop_title\": false,\n  \"user_filter\": {\n    \"buddy_email\": \"\",\n    \"departments\": \"\",\n    \"email\": \"\",\n    \"first_name\": \"\",\n    \"grades\": \"\",\n    \"groups\": \"\",\n    \"id\": \"\",\n    \"is_author\": \"\",\n    \"is_collaborator\": \"\",\n    \"is_manager\": \"\",\n    \"is_purchaser\": \"\",\n    \"last_name\": \"\",\n    \"locations\": \"\",\n    \"manager_email\": \"\",\n    \"org_levels\": \"\",\n    \"partner\": \"\",\n    \"role\": \"\",\n    \"suspended\": \"\",\n    \"teams\": \"\",\n    \"userid\": \"\"\n  },\n  \"workshop_filter\": {\n    \"archived\": \"\",\n    \"categories\": \"\",\n    \"collaborators\": \"\",\n    \"content_id\": \"\",\n    \"created_by\": \"\",\n    \"departments\": \"\",\n    \"grades\": \"\",\n    \"locations\": \"\",\n    \"org_levels\": \"\",\n    \"teams\": \"\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/reports/workshop-status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reports",
+                "workshop-status"
+              ]
+            },
+            "description": "**Workshop status**\n\nCurrent state of workshop registrations and statuses.\n\n**Request body**: see the body tab. Set field flags to `true` to include them in the response. Provide values inside `user_filter` / etc. to narrow results.\n\n**Path dates** (not used): Unix epoch seconds in UTC."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Manager rollups",
+      "item": [
+        {
+          "name": "Manager summary",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"address\": false,\n  \"assignments_completed\": false,\n  \"assignments_pending\": false,\n  \"buddy_email\": false,\n  \"comments\": false,\n  \"created_at\": false,\n  \"departments\": false,\n  \"direct_reports\": false,\n  \"distributor\": false,\n  \"email\": true,\n  \"first_login\": false,\n  \"first_name\": true,\n  \"grade\": false,\n  \"group\": false,\n  \"groups\": false,\n  \"hired_on\": false,\n  \"image\": false,\n  \"is_collaborator\": false,\n  \"is_manager\": false,\n  \"is_purchaser\": false,\n  \"job_title\": false,\n  \"language\": false,\n  \"last_login\": false,\n  \"last_name\": true,\n  \"likes\": false,\n  \"locations\": false,\n  \"manager_email\": false,\n  \"new_hires\": false,\n  \"org_level\": false,\n  \"ratings\": false,\n  \"region\": false,\n  \"role\": false,\n  \"sessions\": false,\n  \"shares\": false,\n  \"suspended\": false,\n  \"suspended_on\": false,\n  \"teams\": false,\n  \"tracks_completed\": false,\n  \"tracks_started\": false,\n  \"userid\": false,\n  \"views\": false,\n  \"workshops_attended\": false,\n  \"manager_filter\": {\n    \"buddy_email\": \"\",\n    \"departments\": \"\",\n    \"email\": \"\",\n    \"first_name\": \"\",\n    \"grades\": \"\",\n    \"groups\": \"\",\n    \"id\": \"\",\n    \"is_author\": \"\",\n    \"is_collaborator\": \"\",\n    \"is_manager\": \"\",\n    \"is_purchaser\": \"\",\n    \"last_name\": \"\",\n    \"locations\": \"\",\n    \"manager_email\": \"\",\n    \"org_levels\": \"\",\n    \"partner\": \"\",\n    \"role\": \"\",\n    \"suspended\": \"\",\n    \"teams\": \"\",\n    \"userid\": \"\"\n  },\n  \"user_filter\": {\n    \"buddy_email\": \"\",\n    \"departments\": \"\",\n    \"email\": \"\",\n    \"first_name\": \"\",\n    \"grades\": \"\",\n    \"groups\": \"\",\n    \"id\": \"\",\n    \"is_author\": \"\",\n    \"is_collaborator\": \"\",\n    \"is_manager\": \"\",\n    \"is_purchaser\": \"\",\n    \"last_name\": \"\",\n    \"locations\": \"\",\n    \"manager_email\": \"\",\n    \"org_levels\": \"\",\n    \"partner\": \"\",\n    \"role\": \"\",\n    \"suspended\": \"\",\n    \"teams\": \"\",\n    \"userid\": \"\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/reports/manager-summary/{{from}}/{{until}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reports",
+                "manager-summary",
+                "{{from}}",
+                "{{until}}"
+              ]
+            },
+            "description": "**Manager summary**\n\nManager-level rollups of their direct reports' learning activity.\n\n**Request body**: see the body tab. Set field flags to `true` to include them in the response. Provide values inside `user_filter` / etc. to narrow results.\n\n**Path dates** (required): Unix epoch seconds in UTC."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://usw2-oapi.continu.co/api/v1",
+      "type": "string",
+      "description": "Production base URL (US-West region)."
+    },
+    {
+      "key": "api_token",
+      "value": "<your-token>",
+      "type": "string",
+      "description": "Continu-issued API token (no prefix; the request header template adds 'Bearer '). 30-day TTL."
+    },
+    {
+      "key": "from",
+      "value": "1714521600",
+      "type": "string",
+      "description": "Start of date range (Unix epoch seconds). Default: 2024-05-01 UTC."
+    },
+    {
+      "key": "until",
+      "value": "1717200000",
+      "type": "string",
+      "description": "End of date range (Unix epoch seconds). Default: 2024-06-01 UTC."
+    }
+  ]
+}

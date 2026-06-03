@@ -1,0 +1,101 @@
+---
+title: "Rate limits"
+description: "50 requests per minute and 5,000 per day, both per company across all tokens."
+---
+
+The API enforces two rate limits, both scoped to your Continu company across all tokens and integrations:
+
+| Limit | Default | Header |
+|---|---|---|
+| Per-minute | **50 requests/minute** | `X-REQUESTS-PER-MINUTE` |
+| Per-day | **5,000 requests/day** | `X-REQUESTS-PER-DAY` |
+
+Both limits are configurable per-customer. If you anticipate sustained usage above defaults, contact your Continu account team to request a higher ceiling.
+
+<Warning>
+  Limits are **per company**, not per token or per client. If your organization runs multiple integrations against this API, they share the same quota.
+</Warning>
+
+## Rate-limit headers
+
+Every authenticated response includes both headers. They report **consumed counts in the current window**, not remaining quota:
+
+```http
+X-REQUESTS-PER-MINUTE: 23
+X-REQUESTS-PER-DAY: 1847
+```
+
+Your client computes remaining as `cap − header_value`. Read the headers from each response and pace yourself when consumption approaches the cap.
+
+<Note>
+  Honest caveat: the headers are written before the cap check, so the request that finally gets throttled reports the over-cap count (e.g., `X-REQUESTS-PER-MINUTE: 51` on the call that returns 429). Easy to mis-test against if you're checking exact equality.
+</Note>
+
+## What 429 returns
+
+Both limits return `HTTP 429 Too Many Requests`. The message body distinguishes which limit triggered:
+
+```http
+HTTP/1.1 429 Too Many Requests
+Content-Type: application/json
+
+# Per-minute exceeded
+{"message": "too many requests per minute, rate limit 50 exceeded 51"}
+
+# Daily exceeded
+{"message": "too many requests today, rate limit 5000 exceeded 5001"}
+```
+
+The cap value in the message reflects your company's actual configured cap (which may be higher than the defaults if you've requested a raise).
+
+<Warning>
+  No `Retry-After` header. The response is JSON body only — your client should not look for `Retry-After`. Use your own backoff schedule, anchored to the current consumption from `X-REQUESTS-PER-MINUTE` / `X-REQUESTS-PER-DAY`.
+</Warning>
+
+## Recommended backoff
+
+```python
+import time
+import requests
+
+def call_with_backoff(url, **kwargs):
+    delay = 30  # start at 30 seconds for the per-minute case
+    for attempt in range(5):
+        response = requests.post(url, **kwargs)
+        if response.status_code != 429:
+            return response
+        # Inspect the message to distinguish daily vs per-minute
+        try:
+            message = response.json().get("message", "")
+        except ValueError:
+            message = ""
+        if message.startswith("too many requests today"):
+            # Daily limit — wait until tomorrow or request a higher cap
+            raise RuntimeError("Daily limit exceeded; request a ceiling raise from Continu")
+        # Per-minute — back off exponentially
+        time.sleep(delay)
+        delay = min(delay * 2, 300)  # cap at 5 minutes
+    raise RuntimeError("Rate limit retries exhausted")
+```
+
+## Response size
+
+The API returns the **full result set in a single response** — there is no cursor or page-token pagination. For high-volume organizations and wide date ranges, responses can be large.
+
+To keep responses manageable:
+
+<CardGroup cols={3}>
+  <Card title="Narrow field selection">
+    Request only the fields you need. Each `true` flag adds to response size.
+  </Card>
+  <Card title="Smaller date windows">
+    Use a day or week at a time for backfills, not months.
+  </Card>
+  <Card title="Use filters">
+    Apply `user_filter` / `entity_filter` / `content_filter` to scope to the slice you actually need.
+  </Card>
+</CardGroup>
+
+## Parallelism trade-off
+
+With a 50/minute ceiling shared across all your tokens, parallelism gains you very little. For large backfills, run sequential requests across narrower date ranges rather than parallel requests across the same range.

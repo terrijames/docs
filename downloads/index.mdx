@@ -1,0 +1,46 @@
+---
+title: "Downloads"
+description: "Postman collection and OpenAPI spec for offline use and direct tool import."
+---
+
+These artifacts cover the same surface as the docs you're reading, packaged for direct tool import.
+
+<CardGroup cols={3}>
+  <Card title="Postman collection" icon="rocket" href="/downloads/Continu-Reporting-API.postman_collection.json">
+    All 14 endpoints pre-populated with available field flags and filter scaffolding. Set three variables (`base_url`, `api_token`, `from`/`until`) and start calling. The collection wires the `Bearer ` prefix into the `Authorization` header for you.
+  </Card>
+  <Card title="OpenAPI 3.0 spec" icon="code" href="/downloads/openapi.json">
+    Raw OpenAPI 3.0 spec for import into your own tooling — code generators, mock servers, custom doc renderers.
+  </Card>
+  <Card title="Swagger 2.0 spec" icon="code" href="/downloads/Continu-Reporting-API-spec.json">
+    Swagger 2.0 version of the same spec, for tooling that doesn't yet support OpenAPI 3.0.
+  </Card>
+</CardGroup>
+
+## Postman setup
+
+<Steps>
+  <Step title="Import the collection">
+    In Postman, click **Import** and select the downloaded `.json` file.
+  </Step>
+  <Step title="Set variables">
+    Open the collection, go to the **Variables** tab, and set:
+
+    | Variable | Value |
+    |---|---|
+    | `base_url` | `https://usw2-oapi.continu.co/api/v1` |
+    | `api_token` | Your Continu-issued token (raw token, no `Bearer` prefix — the collection adds that automatically) |
+    | `from` | Start of date range (Unix epoch seconds) |
+    | `until` | End of date range (Unix epoch seconds) |
+  </Step>
+  <Step title="Pick an endpoint and customize the body">
+    Open any request. The body is pre-populated with every available field flag set to `false` (except `email`, `first_name`, `last_name` which default to `true`). Toggle the fields you want to `true`. Fill in filter values you need.
+  </Step>
+  <Step title="Send">
+    Hit **Send**. The response is a JSON array of records with only the fields you requested populated.
+  </Step>
+</Steps>
+
+<Tip>
+  The Postman collection is the fastest way to validate field-selection behavior. Toggle a field, send, see what comes back. Cheaper than reading the schema.
+</Tip>

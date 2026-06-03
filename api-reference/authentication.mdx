@@ -1,0 +1,97 @@
+---
+title: "Authentication"
+description: "Bearer token in the Authorization header. 30-day TTL, no refresh endpoint."
+---
+
+The API uses a bearer token issued by Continu. Tokens have a **30-day TTL** and there is **no refresh endpoint** — when a token expires, you request a new one and rotate.
+
+## Getting a token
+
+Contact your Continu account team. Tokens are issued per organization. Treat the token like a password:
+
+- Store it in a secret manager (AWS Secrets Manager, GCP Secret Manager, Vault, 1Password, etc.).
+- Never commit it to source control.
+- Rotate it immediately if you suspect exposure.
+
+## Sending the token
+
+Include the token in the `Authorization` header on every request, prefixed with `Bearer`:
+
+```http
+Authorization: Bearer <your-token>
+```
+
+<Warning>
+  The `Bearer` prefix is **required**. The authentication middleware looks for `Bearer` (or `authtoken`) in the header value; a raw token without the prefix will return `401 Unauthorized`.
+</Warning>
+
+## Token lifecycle
+
+Tokens carry an embedded expiry — a Unix-seconds timestamp 30 days from issuance. The middleware rejects expired tokens with `HTTP 401` and a specific message body. There is no `/refresh` endpoint, no auto-extension, and no sliding window — once a token expires, you request a new one.
+
+### Detecting an expired token
+
+When a token has expired, the API returns:
+
+```http
+HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+
+{"message": "invalid token TTL Expired, unauthorized request"}
+```
+
+**Critical detection guidance:** match the message body, not just the status code. Several other 401 conditions return different message strings (missing header, malformed token, insufficient privileges) and are *not* recoverable by re-issuing the token — auto-retrying generic 401s will create an infinite loop.
+
+```python
+import requests
+
+def call_api(endpoint, token, body):
+    response = requests.post(
+        endpoint,
+        headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+        json=body,
+    )
+    if response.status_code == 401:
+        try:
+            message = response.json().get("message", "")
+        except ValueError:
+            message = ""
+        if message.startswith("invalid token TTL Expired"):
+            # Token expired — request a new one and retry once
+            new_token = request_new_token_from_continu()
+            return call_api(endpoint, new_token, body)
+        # Other 401s are not recoverable by retry — surface the error
+        raise RuntimeError(f"Unauthorized (not expired): {message}")
+    response.raise_for_status()
+    return response.json()
+```
+
+<Note>
+  Note the capital "E" in "Expired". Match the exact string. The message is the only field that distinguishes an expired token from other 401 conditions — there's no separate error code or header.
+</Note>
+
+### Operational recommendation
+
+Plan token renewals on a known cadence (e.g., every 28 days) so you're never relying on detection at request time. Detection logic is a safety net for missed rotations, not the primary mechanism.
+
+## Auth-related response codes
+
+<ResponseField name="200 OK" type="success">
+  Token accepted, request processed.
+</ResponseField>
+
+<ResponseField name="401 Unauthorized — expired" type="error">
+  Body: `{"message": "invalid token TTL Expired, unauthorized request"}`. Request a new token.
+</ResponseField>
+
+<ResponseField name="401 Unauthorized — missing/malformed" type="error">
+  Body messages vary (missing header, missing Bearer prefix, decryption failure, wrong token role). Not recoverable by re-issuing the same token type — verify the header format and that the token was issued for the Reporting API.
+</ResponseField>
+
+<ResponseField name="403 Forbidden" type="error">
+  Token is valid but lacks access to the requested resource. Contact your account team if you believe this is in error.
+</ResponseField>
+
+## Token compromise
+
+If you believe a token has been exposed, email [support@continu.co](mailto:support@continu.co) immediately to have it revoked and reissued. There is no self-service revocation.

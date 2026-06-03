@@ -1,0 +1,119 @@
+---
+title: "Quick start"
+description: "Your first Reporting API request in under five minutes."
+---
+
+<Steps>
+  <Step title="Get a token">
+    Contact your Continu account team. Tokens are issued per organization, have a 30-day TTL, and there is no refresh endpoint — request a new one on expiry. Store the token in a secret manager; never commit it to source control.
+  </Step>
+  <Step title="Pick an endpoint">
+    For published-content catalog use cases, start with `POST /reports/content-engagement/{from}/{until}`. For completion sync, `POST /reports/user-engagement/{from}/{until}` or `POST /reports/assignment-summary/{from}/{until}`.
+  </Step>
+  <Step title="Build a request body">
+    The body is a field-selection document — set boolean flags for the fields you want returned, and provide filter objects to narrow results. See [Request model](/api-reference/request-model) for the full pattern.
+  </Step>
+  <Step title="Send it">
+    POST it with your token in the `Authorization` header, prefixed with `Bearer`.
+  </Step>
+</Steps>
+
+## Example: first request
+
+<CodeGroup>
+
+```bash curl
+curl -X POST \
+  'https://usw2-oapi.continu.co/api/v1/reports/content-engagement/1714521600/1717200000' \
+  -H 'Authorization: Bearer <your-token>' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "id": true,
+    "title": true,
+    "type": true,
+    "published": true,
+    "created_at": true,
+    "tags": true,
+    "in_track_title": true,
+    "archived": true,
+    "content_filter": {
+      "archived": "false"
+    }
+  }'
+```
+
+```python python
+import requests
+
+response = requests.post(
+    "https://usw2-oapi.continu.co/api/v1/reports/content-engagement/1714521600/1717200000",
+    headers={
+        "Authorization": "Bearer <your-token>",
+        "Content-Type": "application/json",
+    },
+    json={
+        "id": True,
+        "title": True,
+        "type": True,
+        "published": True,
+        "created_at": True,
+        "tags": True,
+        "in_track_title": True,
+        "archived": True,
+        "content_filter": {"archived": "false"},
+    },
+)
+response.raise_for_status()
+records = response.json()
+```
+
+```javascript node
+const response = await fetch(
+  "https://usw2-oapi.continu.co/api/v1/reports/content-engagement/1714521600/1717200000",
+  {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer <your-token>",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      id: true,
+      title: true,
+      type: true,
+      published: true,
+      created_at: true,
+      tags: true,
+      in_track_title: true,
+      archived: true,
+      content_filter: { archived: "false" },
+    }),
+  }
+);
+
+const records = await response.json();
+```
+
+</CodeGroup>
+
+You'll get back a JSON array, one record per matching content item, with only the fields you requested populated.
+
+<Tip>
+  Prefer Postman? Download the [pre-built collection](/downloads/index) with all 14 endpoints pre-populated with their available field flags. Set three variables (`base_url`, `api_token`, `from`/`until`) and you're calling the API.
+</Tip>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/api-reference/authentication">
+    Bearer token format, 30-day TTL, expired-token detection.
+  </Card>
+  <Card title="Request model" icon="cube" href="/api-reference/request-model">
+    The field-selection pattern in depth.
+  </Card>
+  <Card title="Date handling" icon="calendar" href="/api-reference/date-handling">
+    Unix epoch seconds, time zones, range targets.
+  </Card>
+  <Card title="Sync patterns" icon="arrows-rotate" href="/api-reference/sync-patterns">
+    Incremental sync, backfills, handling deletes.
+  </Card>
+</CardGroup>

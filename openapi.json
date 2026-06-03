@@ -1,0 +1,3808 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Continu Reporting API",
+    "description": "Read-only reporting API for the Continu platform. Pull learning, engagement, assignment, and assessment data into your warehouse, BI, or downstream systems.\n\n**Auth.** Send your API token in the `Authorization` header with a `Bearer` prefix (e.g. `Authorization: Bearer <your-token>`). Tokens have a 30-day TTL and no refresh endpoint — request a new token from your Continu contact on expiry.\n\n**Date ranges.** Path-level `{from}/{until}` parameters are Unix epoch seconds in UTC.\n\n**Request bodies.** Each POST body is a field-selection document: set field flags to `true` to include them in the response, and provide filter objects to narrow results.\n\n**Rate limits.** 50 requests per minute and 5,000 requests per day, both per company across all tokens/integrations. Configurable per-customer on request.",
+    "version": "1.0",
+    "contact": {
+      "name": "Continu API Support",
+      "email": "support@continu.co",
+      "url": "https://continu.co/help"
+    }
+  },
+  "security": [
+    {
+      "BearerAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Content & completion"
+    },
+    {
+      "name": "Assignments"
+    },
+    {
+      "name": "Assessments"
+    },
+    {
+      "name": "Tracks & journeys"
+    },
+    {
+      "name": "SCORM"
+    },
+    {
+      "name": "Workshops"
+    },
+    {
+      "name": "Manager rollups"
+    }
+  ],
+  "paths": {
+    "/reports/content-completion/{from}/{until}": {
+      "post": {
+        "tags": [
+          "Content & completion"
+        ],
+        "summary": "Content completion records",
+        "description": "Per-completion records (one row per user-content completion) in the date range. Use for warehouse loads of completion history.",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "path",
+            "required": true,
+            "description": "Start of date range, inclusive. Unix epoch seconds in UTC.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "until",
+            "in": "path",
+            "required": true,
+            "description": "End of date range, exclusive. Unix epoch seconds in UTC.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token from your Continu contact on expiry.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContentCompletionReport"
+              }
+            }
+          },
+          "description": "Field-selection and filter document.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success. Returns an array of records.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request body."
+          },
+          "401": {
+            "description": "Authentication failed (missing or invalid token)."
+          },
+          "429": {
+            "description": "Rate limit exceeded. Back off and retry."
+          },
+          "500": {
+            "description": "Server error."
+          }
+        }
+      }
+    },
+    "/reports/user-content/{from}/{until}": {
+      "post": {
+        "tags": [
+          "Content & completion"
+        ],
+        "summary": "User content completions (user-centric)",
+        "description": "Same record domain as content-completion, organized for user-centric queries.",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "path",
+            "required": true,
+            "description": "Start of date range, inclusive. Unix epoch seconds in UTC.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "until",
+            "in": "path",
+            "required": true,
+            "description": "End of date range, exclusive. Unix epoch seconds in UTC.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token from your Continu contact on expiry.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserContentReport"
+              }
+            }
+          },
+          "description": "Field-selection and filter document.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success. Returns an array of records.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request body."
+          },
+          "401": {
+            "description": "Authentication failed (missing or invalid token)."
+          },
+          "429": {
+            "description": "Rate limit exceeded. Back off and retry."
+          },
+          "500": {
+            "description": "Server error."
+          }
+        }
+      }
+    },
+    "/reports/content-engagement/{from}/{until}": {
+      "post": {
+        "tags": [
+          "Content & completion"
+        ],
+        "summary": "Content engagement signals",
+        "description": "Returns one record per content item with full metadata (id, title, type, published, created_at, tags, in_track_title, archived, views, likes, ratings, etc.). Works as both an engagement report and a published-content catalog — content records are returned regardless of whether anyone has engaged with them.",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "path",
+            "required": true,
+            "description": "Start of date range, inclusive. Unix epoch seconds in UTC.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "until",
+            "in": "path",
+            "required": true,
+            "description": "End of date range, exclusive. Unix epoch seconds in UTC.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token from your Continu contact on expiry.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContentReport"
+              }
+            }
+          },
+          "description": "Field-selection and filter document.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success. Returns an array of records.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request body."
+          },
+          "401": {
+            "description": "Authentication failed (missing or invalid token)."
+          },
+          "429": {
+            "description": "Rate limit exceeded. Back off and retry."
+          },
+          "500": {
+            "description": "Server error."
+          }
+        }
+      }
+    },
+    "/reports/user-engagement/{from}/{until}": {
+      "post": {
+        "tags": [
+          "Content & completion"
+        ],
+        "summary": "User engagement signals",
+        "description": "Engagement signals organized per user. Use for activity dashboards and identifying inactive users.",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "path",
+            "required": true,
+            "description": "Start of date range, inclusive. Unix epoch seconds in UTC.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "until",
+            "in": "path",
+            "required": true,
+            "description": "End of date range, exclusive. Unix epoch seconds in UTC.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token from your Continu contact on expiry.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserReport"
+              }
+            }
+          },
+          "description": "Field-selection and filter document.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success. Returns an array of records.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request body."
+          },
+          "401": {
+            "description": "Authentication failed (missing or invalid token)."
+          },
+          "429": {
+            "description": "Rate limit exceeded. Back off and retry."
+          },
+          "500": {
+            "description": "Server error."
+          }
+        }
+      }
+    },
+    "/reports/assignment-summary/{from}/{until}": {
+      "post": {
+        "tags": [
+          "Assignments"
+        ],
+        "summary": "Assignment summary",
+        "description": "Summary of assignments created, due, or completed in the date range. Includes per-record content_id, content_title, assigner info, and completion status.",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "path",
+            "required": true,
+            "description": "Start of date range, inclusive. Unix epoch seconds in UTC.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "until",
+            "in": "path",
+            "required": true,
+            "description": "End of date range, exclusive. Unix epoch seconds in UTC.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token from your Continu contact on expiry.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignmentReport"
+              }
+            }
+          },
+          "description": "Field-selection and filter document.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success. Returns an array of records.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request body."
+          },
+          "401": {
+            "description": "Authentication failed (missing or invalid token)."
+          },
+          "429": {
+            "description": "Rate limit exceeded. Back off and retry."
+          },
+          "500": {
+            "description": "Server error."
+          }
+        }
+      }
+    },
+    "/reports/pivoted-content-assignments/{from}/{until}": {
+      "post": {
+        "tags": [
+          "Assignments"
+        ],
+        "summary": "Assignments pivoted by content",
+        "description": "Assignments pivoted by content (rows are content items, columns include assignment counts).",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "path",
+            "required": true,
+            "description": "Start of date range, inclusive. Unix epoch seconds in UTC.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "until",
+            "in": "path",
+            "required": true,
+            "description": "End of date range, exclusive. Unix epoch seconds in UTC.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token from your Continu contact on expiry.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PivotedContentAssignmentReport"
+              }
+            }
+          },
+          "description": "Field-selection and filter document.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success. Returns an array of records.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request body."
+          },
+          "401": {
+            "description": "Authentication failed (missing or invalid token)."
+          },
+          "429": {
+            "description": "Rate limit exceeded. Back off and retry."
+          },
+          "500": {
+            "description": "Server error."
+          }
+        }
+      }
+    },
+    "/reports/pivoted-user-assignments/{from}/{until}": {
+      "post": {
+        "tags": [
+          "Assignments"
+        ],
+        "summary": "Assignments pivoted by user",
+        "description": "Assignments pivoted by user (rows are users, columns include their assignment statuses).",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "path",
+            "required": true,
+            "description": "Start of date range, inclusive. Unix epoch seconds in UTC.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "until",
+            "in": "path",
+            "required": true,
+            "description": "End of date range, exclusive. Unix epoch seconds in UTC.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token from your Continu contact on expiry.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PivotedUserAssignmentReport"
+              }
+            }
+          },
+          "description": "Field-selection and filter document.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success. Returns an array of records.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request body."
+          },
+          "401": {
+            "description": "Authentication failed (missing or invalid token)."
+          },
+          "429": {
+            "description": "Rate limit exceeded. Back off and retry."
+          },
+          "500": {
+            "description": "Server error."
+          }
+        }
+      }
+    },
+    "/reports/simplified/assignments": {
+      "post": {
+        "tags": [
+          "Assignments"
+        ],
+        "summary": "Simplified current-state assignment list",
+        "description": "Lightweight current-state assignment list (no date range).",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token from your Continu contact on expiry.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SimplifiedAssignmentReport"
+              }
+            }
+          },
+          "description": "Field-selection and filter document.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success. Returns an array of records.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request body."
+          },
+          "401": {
+            "description": "Authentication failed (missing or invalid token)."
+          },
+          "429": {
+            "description": "Rate limit exceeded. Back off and retry."
+          },
+          "500": {
+            "description": "Server error."
+          }
+        }
+      }
+    },
+    "/reports/assessment-status": {
+      "post": {
+        "tags": [
+          "Assessments"
+        ],
+        "summary": "Assessment status",
+        "description": "Per-user-per-assessment status (started, completed, score, attempts).",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token from your Continu contact on expiry.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssessmentStatusReport"
+              }
+            }
+          },
+          "description": "Field-selection and filter document.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success. Returns an array of records.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request body."
+          },
+          "401": {
+            "description": "Authentication failed (missing or invalid token)."
+          },
+          "429": {
+            "description": "Rate limit exceeded. Back off and retry."
+          },
+          "500": {
+            "description": "Server error."
+          }
+        }
+      }
+    },
+    "/reports/track-status/{from}/{until}": {
+      "post": {
+        "tags": [
+          "Tracks & journeys"
+        ],
+        "summary": "Track status",
+        "description": "Per-user-per-track progress and completion status.",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "path",
+            "required": true,
+            "description": "Start of date range, inclusive. Unix epoch seconds in UTC.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "until",
+            "in": "path",
+            "required": true,
+            "description": "End of date range, exclusive. Unix epoch seconds in UTC.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token from your Continu contact on expiry.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrackStatusReport"
+              }
+            }
+          },
+          "description": "Field-selection and filter document.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success. Returns an array of records.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request body."
+          },
+          "401": {
+            "description": "Authentication failed (missing or invalid token)."
+          },
+          "429": {
+            "description": "Rate limit exceeded. Back off and retry."
+          },
+          "500": {
+            "description": "Server error."
+          }
+        }
+      }
+    },
+    "/reports/scorm-status/{from}/{until}": {
+      "post": {
+        "tags": [
+          "SCORM"
+        ],
+        "summary": "SCORM status",
+        "description": "SCORM-specific completion and status data.",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "path",
+            "required": true,
+            "description": "Start of date range, inclusive. Unix epoch seconds in UTC.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "until",
+            "in": "path",
+            "required": true,
+            "description": "End of date range, exclusive. Unix epoch seconds in UTC.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token from your Continu contact on expiry.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScormStatusReport"
+              }
+            }
+          },
+          "description": "Field-selection and filter document.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success. Returns an array of records.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request body."
+          },
+          "401": {
+            "description": "Authentication failed (missing or invalid token)."
+          },
+          "429": {
+            "description": "Rate limit exceeded. Back off and retry."
+          },
+          "500": {
+            "description": "Server error."
+          }
+        }
+      }
+    },
+    "/reports/workshop-engagement/{from}/{until}": {
+      "post": {
+        "tags": [
+          "Workshops"
+        ],
+        "summary": "Workshop engagement",
+        "description": "Workshop engagement signals (attendance, participation) in the date range.",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "path",
+            "required": true,
+            "description": "Start of date range, inclusive. Unix epoch seconds in UTC.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "until",
+            "in": "path",
+            "required": true,
+            "description": "End of date range, exclusive. Unix epoch seconds in UTC.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token from your Continu contact on expiry.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkshopEngagementReport"
+              }
+            }
+          },
+          "description": "Field-selection and filter document.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success. Returns an array of records.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request body."
+          },
+          "401": {
+            "description": "Authentication failed (missing or invalid token)."
+          },
+          "429": {
+            "description": "Rate limit exceeded. Back off and retry."
+          },
+          "500": {
+            "description": "Server error."
+          }
+        }
+      }
+    },
+    "/reports/workshop-status": {
+      "post": {
+        "tags": [
+          "Workshops"
+        ],
+        "summary": "Workshop status",
+        "description": "Current state of workshop registrations and statuses.",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token from your Continu contact on expiry.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkshopStatusReport"
+              }
+            }
+          },
+          "description": "Field-selection and filter document.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success. Returns an array of records.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request body."
+          },
+          "401": {
+            "description": "Authentication failed (missing or invalid token)."
+          },
+          "429": {
+            "description": "Rate limit exceeded. Back off and retry."
+          },
+          "500": {
+            "description": "Server error."
+          }
+        }
+      }
+    },
+    "/reports/manager-summary/{from}/{until}": {
+      "post": {
+        "tags": [
+          "Manager rollups"
+        ],
+        "summary": "Manager summary",
+        "description": "Manager-level rollups of their direct reports' learning activity.",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "path",
+            "required": true,
+            "description": "Start of date range, inclusive. Unix epoch seconds in UTC.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "until",
+            "in": "path",
+            "required": true,
+            "description": "End of date range, exclusive. Unix epoch seconds in UTC.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token from your Continu contact on expiry.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManagerReport"
+              }
+            }
+          },
+          "description": "Field-selection and filter document.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success. Returns an array of records.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request body."
+          },
+          "401": {
+            "description": "Authentication failed (missing or invalid token)."
+          },
+          "429": {
+            "description": "Rate limit exceeded. Back off and retry."
+          },
+          "500": {
+            "description": "Server error."
+          }
+        }
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://usw2-oapi.continu.co/api/v1"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header",
+        "description": "Send as `Bearer <token>`. Tokens have a 30-day TTL with no refresh endpoint; on expiry you'll receive a 401 with message body `\"invalid token TTL Expired, unauthorized request\"` — request a new token from your Continu contact."
+      }
+    },
+    "schemas": {
+      "UserFilter": {
+        "type": "object",
+        "description": "Filter object. All fields optional; values are comma-separated strings.",
+        "properties": {
+          "buddy_email": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (buddy_email).",
+            "example": "buddy@example.com"
+          },
+          "departments": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (departments).",
+            "example": "5f8a1c2d4e6b7a9c0d1e2f3a"
+          },
+          "email": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (email).",
+            "example": "user@example.com"
+          },
+          "first_name": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (first_name).",
+            "example": "Alex"
+          },
+          "grades": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (grades).",
+            "example": "5f8a1c2d4e6b7a9c0d1e2f7f"
+          },
+          "groups": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (groups).",
+            "example": "5f8a1c2d4e6b7a9c0d1e2f6e"
+          },
+          "id": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (id).",
+            "example": "5f8a1c2d4e6b7a9c0d1e2ff7"
+          },
+          "is_author": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (is_author).",
+            "example": "false"
+          },
+          "is_collaborator": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (is_collaborator).",
+            "example": "false"
+          },
+          "is_manager": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (is_manager).",
+            "example": "true"
+          },
+          "is_purchaser": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (is_purchaser).",
+            "example": "false"
+          },
+          "last_name": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (last_name).",
+            "example": "Rivera"
+          },
+          "locations": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (locations).",
+            "example": "5f8a1c2d4e6b7a9c0d1e2f4c"
+          },
+          "manager_email": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (manager_email).",
+            "example": "manager@example.com"
+          },
+          "org_levels": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (org_levels).",
+            "example": "5f8a1c2d4e6b7a9c0d1e2f80"
+          },
+          "partner": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (partner).",
+            "example": "5f8a1c2d4e6b7a9c0d1e3008"
+          },
+          "role": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (role).",
+            "example": "learner"
+          },
+          "suspended": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (suspended).",
+            "example": "false"
+          },
+          "teams": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (teams).",
+            "example": "5f8a1c2d4e6b7a9c0d1e2f5d"
+          },
+          "userid": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (userid).",
+            "example": "alex.rivera"
+          }
+        }
+      },
+      "ContentFilter": {
+        "type": "object",
+        "description": "Filter object. All fields optional; values are comma-separated strings.",
+        "properties": {
+          "archived": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (archived).",
+            "example": "false"
+          },
+          "categories": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (categories).",
+            "example": "5f8a1c2d4e6b7a9c0d1e2f91"
+          },
+          "collaborators": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (collaborators).",
+            "example": "5f8a1c2d4e6b7a9c0d1e2fa2"
+          },
+          "content_id": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (content_id).",
+            "example": "5f8a1c2d4e6b7a9c0d1e2fb3"
+          },
+          "created_by": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (created_by).",
+            "example": "5f8a1c2d4e6b7a9c0d1e2fc4"
+          },
+          "departments": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (departments).",
+            "example": "5f8a1c2d4e6b7a9c0d1e2f3a"
+          },
+          "grades": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (grades).",
+            "example": "5f8a1c2d4e6b7a9c0d1e2f7f"
+          },
+          "locations": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (locations).",
+            "example": "5f8a1c2d4e6b7a9c0d1e2f4c"
+          },
+          "org_levels": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (org_levels).",
+            "example": "5f8a1c2d4e6b7a9c0d1e2f80"
+          },
+          "teams": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (teams).",
+            "example": "5f8a1c2d4e6b7a9c0d1e2f5d"
+          }
+        }
+      },
+      "EntityFilter": {
+        "type": "object",
+        "description": "Filter object. All fields optional; values are comma-separated strings.",
+        "properties": {
+          "entity_id": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (entity_id).",
+            "example": "5f8a1c2d4e6b7a9c0d1e3019"
+          },
+          "entity_type": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (entity_type).",
+            "example": "course"
+          }
+        }
+      },
+      "AssignmentFilter": {
+        "type": "object",
+        "description": "Filter object. All fields optional; values are comma-separated strings.",
+        "properties": {
+          "assigner_id": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (assigner_id).",
+            "example": "5f8a1c2d4e6b7a9c0d1e2fd5"
+          },
+          "assignment_id": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (assignment_id).",
+            "example": "5f8a1c2d4e6b7a9c0d1e2fe6"
+          },
+          "content_id": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (content_id).",
+            "example": "5f8a1c2d4e6b7a9c0d1e2fb3"
+          }
+        }
+      },
+      "UserContentFilter": {
+        "type": "object",
+        "description": "Filter object. All fields optional; values are comma-separated strings.",
+        "properties": {
+          "content_id": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (content_id).",
+            "example": "5f8a1c2d4e6b7a9c0d1e2fb3"
+          },
+          "content_type": {
+            "type": "string",
+            "description": "Comma-separated list of values to filter by (content_type).",
+            "example": "course"
+          }
+        }
+      },
+      "AssessmentStatusReport": {
+        "type": "object",
+        "description": "Request body for the AssessmentStatus endpoint. Set field flags to true to include them in the response; provide filter objects to narrow results.",
+        "properties": {
+          "address": {
+            "type": "boolean",
+            "description": "Set to true to include address in the response.",
+            "example": true
+          },
+          "assessment_attempts": {
+            "type": "boolean",
+            "description": "Set to true to include assessment_attempts in the response.",
+            "example": true
+          },
+          "assessment_completed_date": {
+            "type": "boolean",
+            "description": "Set to true to include assessment_completed_date in the response.",
+            "example": true
+          },
+          "assessment_id": {
+            "type": "boolean",
+            "description": "Set to true to include assessment_id in the response.",
+            "example": true
+          },
+          "assessment_score": {
+            "type": "boolean",
+            "description": "Set to true to include assessment_score in the response.",
+            "example": true
+          },
+          "assessment_started_date": {
+            "type": "boolean",
+            "description": "Set to true to include assessment_started_date in the response.",
+            "example": true
+          },
+          "assessment_status": {
+            "type": "boolean",
+            "description": "Set to true to include assessment_status in the response.",
+            "example": true
+          },
+          "assessment_title": {
+            "type": "boolean",
+            "description": "Set to true to include assessment_title in the response.",
+            "example": true
+          },
+          "buddy_email": {
+            "type": "boolean",
+            "description": "Set to true to include buddy_email in the response.",
+            "example": true
+          },
+          "containing_journey": {
+            "type": "boolean",
+            "description": "Set to true to include containing_journey in the response.",
+            "example": true
+          },
+          "containing_journey_id": {
+            "type": "boolean",
+            "description": "Set to true to include containing_journey_id in the response.",
+            "example": true
+          },
+          "containing_track": {
+            "type": "boolean",
+            "description": "Set to true to include containing_track in the response.",
+            "example": true
+          },
+          "containing_track_id": {
+            "type": "boolean",
+            "description": "Set to true to include containing_track_id in the response.",
+            "example": true
+          },
+          "created_at": {
+            "type": "boolean",
+            "description": "Set to true to include created_at in the response.",
+            "example": true
+          },
+          "departments": {
+            "type": "boolean",
+            "description": "Set to true to include departments in the response.",
+            "example": true
+          },
+          "distributor": {
+            "type": "boolean",
+            "description": "Set to true to include distributor in the response.",
+            "example": true
+          },
+          "email": {
+            "type": "boolean",
+            "description": "Set to true to include email in the response.",
+            "example": true
+          },
+          "first_login": {
+            "type": "boolean",
+            "description": "Set to true to include first_login in the response.",
+            "example": true
+          },
+          "first_name": {
+            "type": "boolean",
+            "description": "Set to true to include first_name in the response.",
+            "example": true
+          },
+          "grade": {
+            "type": "boolean",
+            "description": "Set to true to include grade in the response.",
+            "example": true
+          },
+          "group": {
+            "type": "boolean",
+            "description": "Set to true to include group in the response.",
+            "example": true
+          },
+          "groups": {
+            "type": "boolean",
+            "description": "Set to true to include groups in the response.",
+            "example": true
+          },
+          "hired_on": {
+            "type": "boolean",
+            "description": "Set to true to include hired_on in the response.",
+            "example": true
+          },
+          "image": {
+            "type": "boolean",
+            "description": "Set to true to include image in the response.",
+            "example": true
+          },
+          "is_collaborator": {
+            "type": "boolean",
+            "description": "Set to true to include is_collaborator in the response.",
+            "example": true
+          },
+          "is_manager": {
+            "type": "boolean",
+            "description": "Set to true to include is_manager in the response.",
+            "example": true
+          },
+          "is_purchaser": {
+            "type": "boolean",
+            "description": "Set to true to include is_purchaser in the response.",
+            "example": true
+          },
+          "job_title": {
+            "type": "boolean",
+            "description": "Set to true to include job_title in the response.",
+            "example": true
+          },
+          "language": {
+            "type": "boolean",
+            "description": "Set to true to include language in the response.",
+            "example": true
+          },
+          "last_login": {
+            "type": "boolean",
+            "description": "Set to true to include last_login in the response.",
+            "example": true
+          },
+          "last_name": {
+            "type": "boolean",
+            "description": "Set to true to include last_name in the response.",
+            "example": true
+          },
+          "locations": {
+            "type": "boolean",
+            "description": "Set to true to include locations in the response.",
+            "example": true
+          },
+          "manager_email": {
+            "type": "boolean",
+            "description": "Set to true to include manager_email in the response.",
+            "example": true
+          },
+          "org_level": {
+            "type": "boolean",
+            "description": "Set to true to include org_level in the response.",
+            "example": true
+          },
+          "partner": {
+            "type": "boolean",
+            "description": "Set to true to include partner in the response.",
+            "example": true
+          },
+          "partner_name": {
+            "type": "boolean",
+            "description": "Set to true to include partner_name in the response.",
+            "example": true
+          },
+          "region": {
+            "type": "boolean",
+            "description": "Set to true to include region in the response.",
+            "example": true
+          },
+          "role": {
+            "type": "boolean",
+            "description": "Set to true to include role in the response.",
+            "example": true
+          },
+          "suspended": {
+            "type": "boolean",
+            "description": "Set to true to include suspended in the response.",
+            "example": true
+          },
+          "suspended_on": {
+            "type": "boolean",
+            "description": "Set to true to include suspended_on in the response.",
+            "example": true
+          },
+          "teams": {
+            "type": "boolean",
+            "description": "Set to true to include teams in the response.",
+            "example": true
+          },
+          "user_metadata": {
+            "type": "boolean",
+            "description": "Set to true to include user_metadata in the response.",
+            "example": true
+          },
+          "userid": {
+            "type": "boolean",
+            "description": "Set to true to include userid in the response.",
+            "example": true
+          },
+          "assessment_filter": {
+            "$ref": "#/components/schemas/ContentFilter"
+          },
+          "user_filter": {
+            "$ref": "#/components/schemas/UserFilter"
+          }
+        }
+      },
+      "AssignmentReport": {
+        "type": "object",
+        "description": "Request body for the Assignment endpoint. Set field flags to true to include them in the response; provide filter objects to narrow results.",
+        "properties": {
+          "address": {
+            "type": "boolean",
+            "description": "Set to true to include address in the response.",
+            "example": true
+          },
+          "assigned_date": {
+            "type": "boolean",
+            "description": "Set to true to include assigned_date in the response.",
+            "example": true
+          },
+          "assignee_metadata": {
+            "type": "boolean",
+            "description": "Set to true to include assignee_metadata in the response.",
+            "example": true
+          },
+          "assigner": {
+            "type": "boolean",
+            "description": "Set to true to include assigner in the response.",
+            "example": true
+          },
+          "assigner_email": {
+            "type": "boolean",
+            "description": "Set to true to include assigner_email in the response.",
+            "example": true
+          },
+          "assigner_first_name": {
+            "type": "boolean",
+            "description": "Set to true to include assigner_first_name in the response.",
+            "example": true
+          },
+          "assigner_image": {
+            "type": "boolean",
+            "description": "Set to true to include assigner_image in the response.",
+            "example": true
+          },
+          "assigner_is_manager": {
+            "type": "boolean",
+            "description": "Set to true to include assigner_is_manager in the response.",
+            "example": true
+          },
+          "assigner_is_purchaser": {
+            "type": "boolean",
+            "description": "Set to true to include assigner_is_purchaser in the response.",
+            "example": true
+          },
+          "assigner_is_suspended": {
+            "type": "boolean",
+            "description": "Set to true to include assigner_is_suspended in the response.",
+            "example": true
+          },
+          "assigner_job_title": {
+            "type": "boolean",
+            "description": "Set to true to include assigner_job_title in the response.",
+            "example": true
+          },
+          "assigner_last_name": {
+            "type": "boolean",
+            "description": "Set to true to include assigner_last_name in the response.",
+            "example": true
+          },
+          "assigner_userid": {
+            "type": "boolean",
+            "description": "Set to true to include assigner_userid in the response.",
+            "example": true
+          },
+          "assignment_id": {
+            "type": "boolean",
+            "description": "Set to true to include assignment_id in the response.",
+            "example": true
+          },
+          "assignment_status": {
+            "type": "boolean",
+            "description": "Set to true to include assignment_status in the response.",
+            "example": true
+          },
+          "buddy_email": {
+            "type": "boolean",
+            "description": "Set to true to include buddy_email in the response.",
+            "example": true
+          },
+          "completed_date": {
+            "type": "boolean",
+            "description": "Set to true to include completed_date in the response.",
+            "example": true
+          },
+          "content_archived": {
+            "type": "boolean",
+            "description": "Set to true to include content_archived in the response.",
+            "example": true
+          },
+          "content_completed_on": {
+            "type": "boolean",
+            "description": "Set to true to include content_completed_on in the response.",
+            "example": true
+          },
+          "content_id": {
+            "type": "boolean",
+            "description": "Set to true to include content_id in the response.",
+            "example": true
+          },
+          "content_metadata": {
+            "type": "boolean",
+            "description": "Set to true to include content_metadata in the response.",
+            "example": true
+          },
+          "content_title": {
+            "type": "boolean",
+            "description": "Set to true to include content_title in the response.",
+            "example": true
+          },
+          "content_type": {
+            "type": "boolean",
+            "description": "Set to true to include content_type in the response.",
+            "example": true
+          },
+          "created_at": {
+            "type": "boolean",
+            "description": "Set to true to include created_at in the response.",
+            "example": true
+          },
+          "departments": {
+            "type": "boolean",
+            "description": "Set to true to include departments in the response.",
+            "example": true
+          },
+          "distributor": {
+            "type": "boolean",
+            "description": "Set to true to include distributor in the response.",
+            "example": true
+          },
+          "due_date": {
+            "type": "boolean",
+            "description": "Set to true to include due_date in the response.",
+            "example": true
+          },
+          "email": {
+            "type": "boolean",
+            "description": "Set to true to include email in the response.",
+            "example": true
+          },
+          "first_login": {
+            "type": "boolean",
+            "description": "Set to true to include first_login in the response.",
+            "example": true
+          },
+          "first_name": {
+            "type": "boolean",
+            "description": "Set to true to include first_name in the response.",
+            "example": true
+          },
+          "grade": {
+            "type": "boolean",
+            "description": "Set to true to include grade in the response.",
+            "example": true
+          },
+          "group": {
+            "type": "boolean",
+            "description": "Set to true to include group in the response.",
+            "example": true
+          },
+          "groups": {
+            "type": "boolean",
+            "description": "Set to true to include groups in the response.",
+            "example": true
+          },
+          "hired_on": {
+            "type": "boolean",
+            "description": "Set to true to include hired_on in the response.",
+            "example": true
+          },
+          "image": {
+            "type": "boolean",
+            "description": "Set to true to include image in the response.",
+            "example": true
+          },
+          "is_collaborator": {
+            "type": "boolean",
+            "description": "Set to true to include is_collaborator in the response.",
+            "example": true
+          },
+          "is_manager": {
+            "type": "boolean",
+            "description": "Set to true to include is_manager in the response.",
+            "example": true
+          },
+          "is_purchaser": {
+            "type": "boolean",
+            "description": "Set to true to include is_purchaser in the response.",
+            "example": true
+          },
+          "job_title": {
+            "type": "boolean",
+            "description": "Set to true to include job_title in the response.",
+            "example": true
+          },
+          "language": {
+            "type": "boolean",
+            "description": "Set to true to include language in the response.",
+            "example": true
+          },
+          "last_login": {
+            "type": "boolean",
+            "description": "Set to true to include last_login in the response.",
+            "example": true
+          },
+          "last_name": {
+            "type": "boolean",
+            "description": "Set to true to include last_name in the response.",
+            "example": true
+          },
+          "locations": {
+            "type": "boolean",
+            "description": "Set to true to include locations in the response.",
+            "example": true
+          },
+          "manager_email": {
+            "type": "boolean",
+            "description": "Set to true to include manager_email in the response.",
+            "example": true
+          },
+          "manual_completed_by": {
+            "type": "boolean",
+            "description": "Set to true to include manual_completed_by in the response.",
+            "example": true
+          },
+          "manual_completed_by_email": {
+            "type": "boolean",
+            "description": "Set to true to include manual_completed_by_email in the response.",
+            "example": true
+          },
+          "manual_completed_by_first_name": {
+            "type": "boolean",
+            "description": "Set to true to include manual_completed_by_first_name in the response.",
+            "example": true
+          },
+          "manual_completed_by_image": {
+            "type": "boolean",
+            "description": "Set to true to include manual_completed_by_image in the response.",
+            "example": true
+          },
+          "manual_completed_by_is_manager": {
+            "type": "boolean",
+            "description": "Set to true to include manual_completed_by_is_manager in the response.",
+            "example": true
+          },
+          "manual_completed_by_is_suspended": {
+            "type": "boolean",
+            "description": "Set to true to include manual_completed_by_is_suspended in the response.",
+            "example": true
+          },
+          "manual_completed_by_job_title": {
+            "type": "boolean",
+            "description": "Set to true to include manual_completed_by_job_title in the response.",
+            "example": true
+          },
+          "manual_completed_by_last_name": {
+            "type": "boolean",
+            "description": "Set to true to include manual_completed_by_last_name in the response.",
+            "example": true
+          },
+          "manual_completed_by_userid": {
+            "type": "boolean",
+            "description": "Set to true to include manual_completed_by_userid in the response.",
+            "example": true
+          },
+          "org_level": {
+            "type": "boolean",
+            "description": "Set to true to include org_level in the response.",
+            "example": true
+          },
+          "partner": {
+            "type": "boolean",
+            "description": "Set to true to include partner in the response.",
+            "example": true
+          },
+          "partner_name": {
+            "type": "boolean",
+            "description": "Set to true to include partner_name in the response.",
+            "example": true
+          },
+          "region": {
+            "type": "boolean",
+            "description": "Set to true to include region in the response.",
+            "example": true
+          },
+          "role": {
+            "type": "boolean",
+            "description": "Set to true to include role in the response.",
+            "example": true
+          },
+          "suspended": {
+            "type": "boolean",
+            "description": "Set to true to include suspended in the response.",
+            "example": true
+          },
+          "teams": {
+            "type": "boolean",
+            "description": "Set to true to include teams in the response.",
+            "example": true
+          },
+          "updated_date": {
+            "type": "boolean",
+            "description": "Set to true to include updated_date in the response.",
+            "example": true
+          },
+          "userid": {
+            "type": "boolean",
+            "description": "Set to true to include userid in the response.",
+            "example": true
+          },
+          "assignment_filter": {
+            "$ref": "#/components/schemas/AssignmentFilter"
+          },
+          "range_target": {
+            "type": "string",
+            "description": "Which date field the {from}/{until} path range applies to (e.g., assigned_date, completed_date, created_at).",
+            "example": "completed_date"
+          },
+          "user_filter": {
+            "$ref": "#/components/schemas/UserFilter"
+          }
+        }
+      },
+      "ContentCompletionReport": {
+        "type": "object",
+        "description": "Request body for the ContentCompletion endpoint. Set field flags to true to include them in the response; provide filter objects to narrow results.",
+        "properties": {
+          "address": {
+            "type": "boolean",
+            "description": "Set to true to include address in the response.",
+            "example": true
+          },
+          "assignment": {
+            "type": "boolean",
+            "description": "Set to true to include assignment in the response.",
+            "example": true
+          },
+          "buddy_email": {
+            "type": "boolean",
+            "description": "Set to true to include buddy_email in the response.",
+            "example": true
+          },
+          "content": {
+            "type": "boolean",
+            "description": "Set to true to include content in the response.",
+            "example": true
+          },
+          "content_metadata": {
+            "type": "boolean",
+            "description": "Set to true to include content_metadata in the response.",
+            "example": true
+          },
+          "created_at": {
+            "type": "boolean",
+            "description": "Set to true to include created_at in the response.",
+            "example": true
+          },
+          "departments": {
+            "type": "boolean",
+            "description": "Set to true to include departments in the response.",
+            "example": true
+          },
+          "distributor": {
+            "type": "boolean",
+            "description": "Set to true to include distributor in the response.",
+            "example": true
+          },
+          "email": {
+            "type": "boolean",
+            "description": "Set to true to include email in the response.",
+            "example": true
+          },
+          "first_login": {
+            "type": "boolean",
+            "description": "Set to true to include first_login in the response.",
+            "example": true
+          },
+          "first_name": {
+            "type": "boolean",
+            "description": "Set to true to include first_name in the response.",
+            "example": true
+          },
+          "grade": {
+            "type": "boolean",
+            "description": "Set to true to include grade in the response.",
+            "example": true
+          },
+          "group": {
+            "type": "boolean",
+            "description": "Set to true to include group in the response.",
+            "example": true
+          },
+          "groups": {
+            "type": "boolean",
+            "description": "Set to true to include groups in the response.",
+            "example": true
+          },
+          "hired_on": {
+            "type": "boolean",
+            "description": "Set to true to include hired_on in the response.",
+            "example": true
+          },
+          "image": {
+            "type": "boolean",
+            "description": "Set to true to include image in the response.",
+            "example": true
+          },
+          "is_collaborator": {
+            "type": "boolean",
+            "description": "Set to true to include is_collaborator in the response.",
+            "example": true
+          },
+          "is_manager": {
+            "type": "boolean",
+            "description": "Set to true to include is_manager in the response.",
+            "example": true
+          },
+          "is_purchaser": {
+            "type": "boolean",
+            "description": "Set to true to include is_purchaser in the response.",
+            "example": true
+          },
+          "job_title": {
+            "type": "boolean",
+            "description": "Set to true to include job_title in the response.",
+            "example": true
+          },
+          "journey": {
+            "type": "boolean",
+            "description": "Set to true to include journey in the response.",
+            "example": true
+          },
+          "language": {
+            "type": "boolean",
+            "description": "Set to true to include language in the response.",
+            "example": true
+          },
+          "last_login": {
+            "type": "boolean",
+            "description": "Set to true to include last_login in the response.",
+            "example": true
+          },
+          "last_name": {
+            "type": "boolean",
+            "description": "Set to true to include last_name in the response.",
+            "example": true
+          },
+          "locations": {
+            "type": "boolean",
+            "description": "Set to true to include locations in the response.",
+            "example": true
+          },
+          "manager_email": {
+            "type": "boolean",
+            "description": "Set to true to include manager_email in the response.",
+            "example": true
+          },
+          "org_level": {
+            "type": "boolean",
+            "description": "Set to true to include org_level in the response.",
+            "example": true
+          },
+          "partner": {
+            "type": "boolean",
+            "description": "Set to true to include partner in the response.",
+            "example": true
+          },
+          "partner_name": {
+            "type": "boolean",
+            "description": "Set to true to include partner_name in the response.",
+            "example": true
+          },
+          "region": {
+            "type": "boolean",
+            "description": "Set to true to include region in the response.",
+            "example": true
+          },
+          "role": {
+            "type": "boolean",
+            "description": "Set to true to include role in the response.",
+            "example": true
+          },
+          "suspended": {
+            "type": "boolean",
+            "description": "Set to true to include suspended in the response.",
+            "example": true
+          },
+          "suspended_on": {
+            "type": "boolean",
+            "description": "Set to true to include suspended_on in the response.",
+            "example": true
+          },
+          "teams": {
+            "type": "boolean",
+            "description": "Set to true to include teams in the response.",
+            "example": true
+          },
+          "track": {
+            "type": "boolean",
+            "description": "Set to true to include track in the response.",
+            "example": true
+          },
+          "user_metadata": {
+            "type": "boolean",
+            "description": "Set to true to include user_metadata in the response.",
+            "example": true
+          },
+          "userid": {
+            "type": "boolean",
+            "description": "Set to true to include userid in the response.",
+            "example": true
+          },
+          "entity_filter": {
+            "$ref": "#/components/schemas/EntityFilter"
+          },
+          "range_target": {
+            "type": "string",
+            "description": "Which date field the {from}/{until} path range applies to (e.g., assigned_date, completed_date, created_at).",
+            "example": "completed_date"
+          },
+          "sort_by": {
+            "type": "string",
+            "description": "Which field to sort the response by (e.g., updated_date).",
+            "example": "updated_date"
+          },
+          "user_filter": {
+            "$ref": "#/components/schemas/UserFilter"
+          }
+        }
+      },
+      "ContentReport": {
+        "type": "object",
+        "description": "Request body for the Content endpoint. Set field flags to true to include them in the response; provide filter objects to narrow results.",
+        "properties": {
+          "archived": {
+            "type": "boolean",
+            "description": "Set to true to include archived in the response.",
+            "example": true
+          },
+          "assignments_completed": {
+            "type": "boolean",
+            "description": "Set to true to include assignments_completed in the response.",
+            "example": true
+          },
+          "assignments_pending": {
+            "type": "boolean",
+            "description": "Set to true to include assignments_pending in the response.",
+            "example": true
+          },
+          "comments": {
+            "type": "boolean",
+            "description": "Set to true to include comments in the response.",
+            "example": true
+          },
+          "created_at": {
+            "type": "boolean",
+            "description": "Set to true to include created_at in the response.",
+            "example": true
+          },
+          "created_by": {
+            "type": "boolean",
+            "description": "Set to true to include created_by in the response.",
+            "example": true
+          },
+          "creator": {
+            "type": "boolean",
+            "description": "Set to true to include creator in the response.",
+            "example": true
+          },
+          "creator_email": {
+            "type": "boolean",
+            "description": "Set to true to include creator_email in the response.",
+            "example": true
+          },
+          "creator_first_name": {
+            "type": "boolean",
+            "description": "Set to true to include creator_first_name in the response.",
+            "example": true
+          },
+          "creator_image": {
+            "type": "boolean",
+            "description": "Set to true to include creator_image in the response.",
+            "example": true
+          },
+          "creator_is_manager": {
+            "type": "boolean",
+            "description": "Set to true to include creator_is_manager in the response.",
+            "example": true
+          },
+          "creator_job_title": {
+            "type": "boolean",
+            "description": "Set to true to include creator_job_title in the response.",
+            "example": true
+          },
+          "creator_last_name": {
+            "type": "boolean",
+            "description": "Set to true to include creator_last_name in the response.",
+            "example": true
+          },
+          "creator_userid": {
+            "type": "boolean",
+            "description": "Set to true to include creator_userid in the response.",
+            "example": true
+          },
+          "id": {
+            "type": "boolean",
+            "description": "Set to true to include id in the response.",
+            "example": true
+          },
+          "in_track_title": {
+            "type": "boolean",
+            "description": "Set to true to include in_track_title in the response.",
+            "example": true
+          },
+          "likes": {
+            "type": "boolean",
+            "description": "Set to true to include likes in the response.",
+            "example": true
+          },
+          "linked_categories": {
+            "type": "boolean",
+            "description": "Set to true to include linked_categories in the response.",
+            "example": true
+          },
+          "metadata": {
+            "type": "boolean",
+            "description": "Set to true to include metadata in the response.",
+            "example": true
+          },
+          "on_explore": {
+            "type": "boolean",
+            "description": "Set to true to include on_explore in the response.",
+            "example": true
+          },
+          "privacy_collaborators": {
+            "type": "boolean",
+            "description": "Set to true to include privacy_collaborators in the response.",
+            "example": true
+          },
+          "privacy_departments": {
+            "type": "boolean",
+            "description": "Set to true to include privacy_departments in the response.",
+            "example": true
+          },
+          "privacy_grade": {
+            "type": "boolean",
+            "description": "Set to true to include privacy_grade in the response.",
+            "example": true
+          },
+          "privacy_locations": {
+            "type": "boolean",
+            "description": "Set to true to include privacy_locations in the response.",
+            "example": true
+          },
+          "privacy_org_level": {
+            "type": "boolean",
+            "description": "Set to true to include privacy_org_level in the response.",
+            "example": true
+          },
+          "privacy_teams": {
+            "type": "boolean",
+            "description": "Set to true to include privacy_teams in the response.",
+            "example": true
+          },
+          "published": {
+            "type": "boolean",
+            "description": "Set to true to include published in the response.",
+            "example": true
+          },
+          "ratings": {
+            "type": "boolean",
+            "description": "Set to true to include ratings in the response.",
+            "example": true
+          },
+          "ratings_average": {
+            "type": "boolean",
+            "description": "Set to true to include ratings_average in the response.",
+            "example": true
+          },
+          "shares": {
+            "type": "boolean",
+            "description": "Set to true to include shares in the response.",
+            "example": true
+          },
+          "tags": {
+            "type": "boolean",
+            "description": "Set to true to include tags in the response.",
+            "example": true
+          },
+          "title": {
+            "type": "boolean",
+            "description": "Set to true to include title in the response.",
+            "example": true
+          },
+          "type": {
+            "type": "boolean",
+            "description": "Set to true to include type in the response.",
+            "example": true
+          },
+          "updated_at": {
+            "type": "boolean",
+            "description": "Set to true to include updated_at in the response.",
+            "example": true
+          },
+          "url": {
+            "type": "boolean",
+            "description": "Set to true to include url in the response.",
+            "example": true
+          },
+          "views": {
+            "type": "boolean",
+            "description": "Set to true to include views in the response.",
+            "example": true
+          },
+          "content_filter": {
+            "$ref": "#/components/schemas/ContentFilter"
+          }
+        }
+      },
+      "ManagerReport": {
+        "type": "object",
+        "description": "Request body for the Manager endpoint. Set field flags to true to include them in the response; provide filter objects to narrow results.",
+        "properties": {
+          "address": {
+            "type": "boolean",
+            "description": "Set to true to include address in the response.",
+            "example": true
+          },
+          "assignments_completed": {
+            "type": "boolean",
+            "description": "Set to true to include assignments_completed in the response.",
+            "example": true
+          },
+          "assignments_pending": {
+            "type": "boolean",
+            "description": "Set to true to include assignments_pending in the response.",
+            "example": true
+          },
+          "buddy_email": {
+            "type": "boolean",
+            "description": "Set to true to include buddy_email in the response.",
+            "example": true
+          },
+          "comments": {
+            "type": "boolean",
+            "description": "Set to true to include comments in the response.",
+            "example": true
+          },
+          "created_at": {
+            "type": "boolean",
+            "description": "Set to true to include created_at in the response.",
+            "example": true
+          },
+          "departments": {
+            "type": "boolean",
+            "description": "Set to true to include departments in the response.",
+            "example": true
+          },
+          "direct_reports": {
+            "type": "boolean",
+            "description": "Set to true to include direct_reports in the response.",
+            "example": true
+          },
+          "distributor": {
+            "type": "boolean",
+            "description": "Set to true to include distributor in the response.",
+            "example": true
+          },
+          "email": {
+            "type": "boolean",
+            "description": "Set to true to include email in the response.",
+            "example": true
+          },
+          "first_login": {
+            "type": "boolean",
+            "description": "Set to true to include first_login in the response.",
+            "example": true
+          },
+          "first_name": {
+            "type": "boolean",
+            "description": "Set to true to include first_name in the response.",
+            "example": true
+          },
+          "grade": {
+            "type": "boolean",
+            "description": "Set to true to include grade in the response.",
+            "example": true
+          },
+          "group": {
+            "type": "boolean",
+            "description": "Set to true to include group in the response.",
+            "example": true
+          },
+          "groups": {
+            "type": "boolean",
+            "description": "Set to true to include groups in the response.",
+            "example": true
+          },
+          "hired_on": {
+            "type": "boolean",
+            "description": "Set to true to include hired_on in the response.",
+            "example": true
+          },
+          "image": {
+            "type": "boolean",
+            "description": "Set to true to include image in the response.",
+            "example": true
+          },
+          "is_collaborator": {
+            "type": "boolean",
+            "description": "Set to true to include is_collaborator in the response.",
+            "example": true
+          },
+          "is_manager": {
+            "type": "boolean",
+            "description": "Set to true to include is_manager in the response.",
+            "example": true
+          },
+          "is_purchaser": {
+            "type": "boolean",
+            "description": "Set to true to include is_purchaser in the response.",
+            "example": true
+          },
+          "job_title": {
+            "type": "boolean",
+            "description": "Set to true to include job_title in the response.",
+            "example": true
+          },
+          "language": {
+            "type": "boolean",
+            "description": "Set to true to include language in the response.",
+            "example": true
+          },
+          "last_login": {
+            "type": "boolean",
+            "description": "Set to true to include last_login in the response.",
+            "example": true
+          },
+          "last_name": {
+            "type": "boolean",
+            "description": "Set to true to include last_name in the response.",
+            "example": true
+          },
+          "likes": {
+            "type": "boolean",
+            "description": "Set to true to include likes in the response.",
+            "example": true
+          },
+          "locations": {
+            "type": "boolean",
+            "description": "Set to true to include locations in the response.",
+            "example": true
+          },
+          "manager_email": {
+            "type": "boolean",
+            "description": "Set to true to include manager_email in the response.",
+            "example": true
+          },
+          "new_hires": {
+            "type": "boolean",
+            "description": "Set to true to include new_hires in the response.",
+            "example": true
+          },
+          "org_level": {
+            "type": "boolean",
+            "description": "Set to true to include org_level in the response.",
+            "example": true
+          },
+          "ratings": {
+            "type": "boolean",
+            "description": "Set to true to include ratings in the response.",
+            "example": true
+          },
+          "region": {
+            "type": "boolean",
+            "description": "Set to true to include region in the response.",
+            "example": true
+          },
+          "role": {
+            "type": "boolean",
+            "description": "Set to true to include role in the response.",
+            "example": true
+          },
+          "sessions": {
+            "type": "boolean",
+            "description": "Set to true to include sessions in the response.",
+            "example": true
+          },
+          "shares": {
+            "type": "boolean",
+            "description": "Set to true to include shares in the response.",
+            "example": true
+          },
+          "suspended": {
+            "type": "boolean",
+            "description": "Set to true to include suspended in the response.",
+            "example": true
+          },
+          "suspended_on": {
+            "type": "boolean",
+            "description": "Set to true to include suspended_on in the response.",
+            "example": true
+          },
+          "teams": {
+            "type": "boolean",
+            "description": "Set to true to include teams in the response.",
+            "example": true
+          },
+          "tracks_completed": {
+            "type": "boolean",
+            "description": "Set to true to include tracks_completed in the response.",
+            "example": true
+          },
+          "tracks_started": {
+            "type": "boolean",
+            "description": "Set to true to include tracks_started in the response.",
+            "example": true
+          },
+          "userid": {
+            "type": "boolean",
+            "description": "Set to true to include userid in the response.",
+            "example": true
+          },
+          "views": {
+            "type": "boolean",
+            "description": "Set to true to include views in the response.",
+            "example": true
+          },
+          "workshops_attended": {
+            "type": "boolean",
+            "description": "Set to true to include workshops_attended in the response.",
+            "example": true
+          },
+          "manager_filter": {
+            "$ref": "#/components/schemas/UserFilter"
+          },
+          "user_filter": {
+            "$ref": "#/components/schemas/UserFilter"
+          }
+        }
+      },
+      "PivotedContentAssignmentReport": {
+        "type": "object",
+        "description": "Request body for the PivotedContentAssignment endpoint. Set field flags to true to include them in the response; provide filter objects to narrow results.",
+        "properties": {
+          "assignee": {
+            "type": "boolean",
+            "description": "Set to true to include assignee in the response.",
+            "example": true
+          },
+          "assigner": {
+            "type": "boolean",
+            "description": "Set to true to include assigner in the response.",
+            "example": true
+          },
+          "manual_completed_by": {
+            "type": "boolean",
+            "description": "Set to true to include manual_completed_by in the response.",
+            "example": true
+          },
+          "content_filter": {
+            "$ref": "#/components/schemas/ContentFilter"
+          },
+          "range_target": {
+            "type": "string",
+            "description": "Which date field the {from}/{until} path range applies to (e.g., assigned_date, completed_date, created_at).",
+            "example": "completed_date"
+          },
+          "user_filter": {
+            "$ref": "#/components/schemas/UserFilter"
+          }
+        }
+      },
+      "PivotedUserAssignmentReport": {
+        "type": "object",
+        "description": "Request body for the PivotedUserAssignment endpoint. Set field flags to true to include them in the response; provide filter objects to narrow results.",
+        "properties": {
+          "all_assignments": {
+            "type": "boolean",
+            "description": "Set to true to include all_assignments in the response.",
+            "example": true
+          },
+          "content_filter": {
+            "$ref": "#/components/schemas/ContentFilter"
+          },
+          "range_target": {
+            "type": "string",
+            "description": "Which date field the {from}/{until} path range applies to (e.g., assigned_date, completed_date, created_at).",
+            "example": "completed_date"
+          },
+          "unsuspended_from": {
+            "type": "string",
+            "description": "Lower bound (epoch seconds) for filtering by unsuspended date.",
+            "example": ""
+          },
+          "unsuspended_to": {
+            "type": "string",
+            "description": "Upper bound (epoch seconds) for filtering by unsuspended date.",
+            "example": ""
+          },
+          "user_filter": {
+            "$ref": "#/components/schemas/UserFilter"
+          }
+        }
+      },
+      "ScormStatusReport": {
+        "type": "object",
+        "description": "Request body for the ScormStatus endpoint. Set field flags to true to include them in the response; provide filter objects to narrow results.",
+        "properties": {
+          "address": {
+            "type": "boolean",
+            "description": "Set to true to include address in the response.",
+            "example": true
+          },
+          "buddy_email": {
+            "type": "boolean",
+            "description": "Set to true to include buddy_email in the response.",
+            "example": true
+          },
+          "containing_journey": {
+            "type": "boolean",
+            "description": "Set to true to include containing_journey in the response.",
+            "example": true
+          },
+          "containing_journey_id": {
+            "type": "boolean",
+            "description": "Set to true to include containing_journey_id in the response.",
+            "example": true
+          },
+          "containing_track": {
+            "type": "boolean",
+            "description": "Set to true to include containing_track in the response.",
+            "example": true
+          },
+          "containing_track_id": {
+            "type": "boolean",
+            "description": "Set to true to include containing_track_id in the response.",
+            "example": true
+          },
+          "created_at": {
+            "type": "boolean",
+            "description": "Set to true to include created_at in the response.",
+            "example": true
+          },
+          "departments": {
+            "type": "boolean",
+            "description": "Set to true to include departments in the response.",
+            "example": true
+          },
+          "distributor": {
+            "type": "boolean",
+            "description": "Set to true to include distributor in the response.",
+            "example": true
+          },
+          "email": {
+            "type": "boolean",
+            "description": "Set to true to include email in the response.",
+            "example": true
+          },
+          "first_login": {
+            "type": "boolean",
+            "description": "Set to true to include first_login in the response.",
+            "example": true
+          },
+          "first_name": {
+            "type": "boolean",
+            "description": "Set to true to include first_name in the response.",
+            "example": true
+          },
+          "grade": {
+            "type": "boolean",
+            "description": "Set to true to include grade in the response.",
+            "example": true
+          },
+          "group": {
+            "type": "boolean",
+            "description": "Set to true to include group in the response.",
+            "example": true
+          },
+          "groups": {
+            "type": "boolean",
+            "description": "Set to true to include groups in the response.",
+            "example": true
+          },
+          "hired_on": {
+            "type": "boolean",
+            "description": "Set to true to include hired_on in the response.",
+            "example": true
+          },
+          "image": {
+            "type": "boolean",
+            "description": "Set to true to include image in the response.",
+            "example": true
+          },
+          "is_collaborator": {
+            "type": "boolean",
+            "description": "Set to true to include is_collaborator in the response.",
+            "example": true
+          },
+          "is_manager": {
+            "type": "boolean",
+            "description": "Set to true to include is_manager in the response.",
+            "example": true
+          },
+          "is_purchaser": {
+            "type": "boolean",
+            "description": "Set to true to include is_purchaser in the response.",
+            "example": true
+          },
+          "job_title": {
+            "type": "boolean",
+            "description": "Set to true to include job_title in the response.",
+            "example": true
+          },
+          "language": {
+            "type": "boolean",
+            "description": "Set to true to include language in the response.",
+            "example": true
+          },
+          "last_login": {
+            "type": "boolean",
+            "description": "Set to true to include last_login in the response.",
+            "example": true
+          },
+          "last_name": {
+            "type": "boolean",
+            "description": "Set to true to include last_name in the response.",
+            "example": true
+          },
+          "locations": {
+            "type": "boolean",
+            "description": "Set to true to include locations in the response.",
+            "example": true
+          },
+          "manager_email": {
+            "type": "boolean",
+            "description": "Set to true to include manager_email in the response.",
+            "example": true
+          },
+          "manual_completed_by": {
+            "type": "boolean",
+            "description": "Set to true to include manual_completed_by in the response.",
+            "example": true
+          },
+          "manual_completed_by_email": {
+            "type": "boolean",
+            "description": "Set to true to include manual_completed_by_email in the response.",
+            "example": true
+          },
+          "manual_completed_by_first_name": {
+            "type": "boolean",
+            "description": "Set to true to include manual_completed_by_first_name in the response.",
+            "example": true
+          },
+          "manual_completed_by_image": {
+            "type": "boolean",
+            "description": "Set to true to include manual_completed_by_image in the response.",
+            "example": true
+          },
+          "manual_completed_by_is_manager": {
+            "type": "boolean",
+            "description": "Set to true to include manual_completed_by_is_manager in the response.",
+            "example": true
+          },
+          "manual_completed_by_job_title": {
+            "type": "boolean",
+            "description": "Set to true to include manual_completed_by_job_title in the response.",
+            "example": true
+          },
+          "manual_completed_by_last_name": {
+            "type": "boolean",
+            "description": "Set to true to include manual_completed_by_last_name in the response.",
+            "example": true
+          },
+          "manual_completed_by_userid": {
+            "type": "boolean",
+            "description": "Set to true to include manual_completed_by_userid in the response.",
+            "example": true
+          },
+          "org_level": {
+            "type": "boolean",
+            "description": "Set to true to include org_level in the response.",
+            "example": true
+          },
+          "partner": {
+            "type": "boolean",
+            "description": "Set to true to include partner in the response.",
+            "example": true
+          },
+          "partner_name": {
+            "type": "boolean",
+            "description": "Set to true to include partner_name in the response.",
+            "example": true
+          },
+          "region": {
+            "type": "boolean",
+            "description": "Set to true to include region in the response.",
+            "example": true
+          },
+          "role": {
+            "type": "boolean",
+            "description": "Set to true to include role in the response.",
+            "example": true
+          },
+          "scorm_id": {
+            "type": "boolean",
+            "description": "Set to true to include scorm_id in the response.",
+            "example": true
+          },
+          "scorm_last_updated_date": {
+            "type": "boolean",
+            "description": "Set to true to include scorm_last_updated_date in the response.",
+            "example": true
+          },
+          "scorm_started_date": {
+            "type": "boolean",
+            "description": "Set to true to include scorm_started_date in the response.",
+            "example": true
+          },
+          "scorm_status": {
+            "type": "boolean",
+            "description": "Set to true to include scorm_status in the response.",
+            "example": true
+          },
+          "scorm_title": {
+            "type": "boolean",
+            "description": "Set to true to include scorm_title in the response.",
+            "example": true
+          },
+          "suspended": {
+            "type": "boolean",
+            "description": "Set to true to include suspended in the response.",
+            "example": true
+          },
+          "suspended_on": {
+            "type": "boolean",
+            "description": "Set to true to include suspended_on in the response.",
+            "example": true
+          },
+          "teams": {
+            "type": "boolean",
+            "description": "Set to true to include teams in the response.",
+            "example": true
+          },
+          "user_metadata": {
+            "type": "boolean",
+            "description": "Set to true to include user_metadata in the response.",
+            "example": true
+          },
+          "userid": {
+            "type": "boolean",
+            "description": "Set to true to include userid in the response.",
+            "example": true
+          },
+          "range_target": {
+            "type": "string",
+            "description": "Which date field the {from}/{until} path range applies to (e.g., assigned_date, completed_date, created_at).",
+            "example": "completed_date"
+          },
+          "scorm_filter": {
+            "$ref": "#/components/schemas/ContentFilter"
+          },
+          "user_filter": {
+            "$ref": "#/components/schemas/UserFilter"
+          }
+        }
+      },
+      "SimplifiedAssignmentReport": {
+        "type": "object",
+        "description": "Request body for the SimplifiedAssignment endpoint. Set field flags to true to include them in the response; provide filter objects to narrow results.",
+        "properties": {
+          "assignee": {
+            "type": "boolean",
+            "description": "Set to true to include assignee in the response.",
+            "example": true
+          },
+          "assigner": {
+            "type": "boolean",
+            "description": "Set to true to include assigner in the response.",
+            "example": true
+          },
+          "manual_completed_by": {
+            "type": "boolean",
+            "description": "Set to true to include manual_completed_by in the response.",
+            "example": true
+          },
+          "sort_by": {
+            "type": "string",
+            "description": "Which field to sort the response by (e.g., updated_date).",
+            "example": "updated_date"
+          }
+        }
+      },
+      "TrackStatusReport": {
+        "type": "object",
+        "description": "Request body for the TrackStatus endpoint. Set field flags to true to include them in the response; provide filter objects to narrow results.",
+        "properties": {
+          "address": {
+            "type": "boolean",
+            "description": "Set to true to include address in the response.",
+            "example": true
+          },
+          "buddy_email": {
+            "type": "boolean",
+            "description": "Set to true to include buddy_email in the response.",
+            "example": true
+          },
+          "containing_journey": {
+            "type": "boolean",
+            "description": "Set to true to include containing_journey in the response.",
+            "example": true
+          },
+          "containing_journey_id": {
+            "type": "boolean",
+            "description": "Set to true to include containing_journey_id in the response.",
+            "example": true
+          },
+          "created_at": {
+            "type": "boolean",
+            "description": "Set to true to include created_at in the response.",
+            "example": true
+          },
+          "departments": {
+            "type": "boolean",
+            "description": "Set to true to include departments in the response.",
+            "example": true
+          },
+          "distributor": {
+            "type": "boolean",
+            "description": "Set to true to include distributor in the response.",
+            "example": true
+          },
+          "email": {
+            "type": "boolean",
+            "description": "Set to true to include email in the response.",
+            "example": true
+          },
+          "first_login": {
+            "type": "boolean",
+            "description": "Set to true to include first_login in the response.",
+            "example": true
+          },
+          "first_name": {
+            "type": "boolean",
+            "description": "Set to true to include first_name in the response.",
+            "example": true
+          },
+          "grade": {
+            "type": "boolean",
+            "description": "Set to true to include grade in the response.",
+            "example": true
+          },
+          "group": {
+            "type": "boolean",
+            "description": "Set to true to include group in the response.",
+            "example": true
+          },
+          "groups": {
+            "type": "boolean",
+            "description": "Set to true to include groups in the response.",
+            "example": true
+          },
+          "hired_on": {
+            "type": "boolean",
+            "description": "Set to true to include hired_on in the response.",
+            "example": true
+          },
+          "image": {
+            "type": "boolean",
+            "description": "Set to true to include image in the response.",
+            "example": true
+          },
+          "is_collaborator": {
+            "type": "boolean",
+            "description": "Set to true to include is_collaborator in the response.",
+            "example": true
+          },
+          "is_manager": {
+            "type": "boolean",
+            "description": "Set to true to include is_manager in the response.",
+            "example": true
+          },
+          "is_purchaser": {
+            "type": "boolean",
+            "description": "Set to true to include is_purchaser in the response.",
+            "example": true
+          },
+          "job_title": {
+            "type": "boolean",
+            "description": "Set to true to include job_title in the response.",
+            "example": true
+          },
+          "language": {
+            "type": "boolean",
+            "description": "Set to true to include language in the response.",
+            "example": true
+          },
+          "last_login": {
+            "type": "boolean",
+            "description": "Set to true to include last_login in the response.",
+            "example": true
+          },
+          "last_name": {
+            "type": "boolean",
+            "description": "Set to true to include last_name in the response.",
+            "example": true
+          },
+          "locations": {
+            "type": "boolean",
+            "description": "Set to true to include locations in the response.",
+            "example": true
+          },
+          "manager_email": {
+            "type": "boolean",
+            "description": "Set to true to include manager_email in the response.",
+            "example": true
+          },
+          "manual_completed_by": {
+            "type": "boolean",
+            "description": "Set to true to include manual_completed_by in the response.",
+            "example": true
+          },
+          "manual_completed_by_email": {
+            "type": "boolean",
+            "description": "Set to true to include manual_completed_by_email in the response.",
+            "example": true
+          },
+          "manual_completed_by_first_name": {
+            "type": "boolean",
+            "description": "Set to true to include manual_completed_by_first_name in the response.",
+            "example": true
+          },
+          "manual_completed_by_image": {
+            "type": "boolean",
+            "description": "Set to true to include manual_completed_by_image in the response.",
+            "example": true
+          },
+          "manual_completed_by_is_manager": {
+            "type": "boolean",
+            "description": "Set to true to include manual_completed_by_is_manager in the response.",
+            "example": true
+          },
+          "manual_completed_by_job_title": {
+            "type": "boolean",
+            "description": "Set to true to include manual_completed_by_job_title in the response.",
+            "example": true
+          },
+          "manual_completed_by_last_name": {
+            "type": "boolean",
+            "description": "Set to true to include manual_completed_by_last_name in the response.",
+            "example": true
+          },
+          "manual_completed_by_userid": {
+            "type": "boolean",
+            "description": "Set to true to include manual_completed_by_userid in the response.",
+            "example": true
+          },
+          "org_level": {
+            "type": "boolean",
+            "description": "Set to true to include org_level in the response.",
+            "example": true
+          },
+          "partner": {
+            "type": "boolean",
+            "description": "Set to true to include partner in the response.",
+            "example": true
+          },
+          "partner_name": {
+            "type": "boolean",
+            "description": "Set to true to include partner_name in the response.",
+            "example": true
+          },
+          "region": {
+            "type": "boolean",
+            "description": "Set to true to include region in the response.",
+            "example": true
+          },
+          "role": {
+            "type": "boolean",
+            "description": "Set to true to include role in the response.",
+            "example": true
+          },
+          "suspended": {
+            "type": "boolean",
+            "description": "Set to true to include suspended in the response.",
+            "example": true
+          },
+          "suspended_on": {
+            "type": "boolean",
+            "description": "Set to true to include suspended_on in the response.",
+            "example": true
+          },
+          "teams": {
+            "type": "boolean",
+            "description": "Set to true to include teams in the response.",
+            "example": true
+          },
+          "track_completed_date": {
+            "type": "boolean",
+            "description": "Set to true to include track_completed_date in the response.",
+            "example": true
+          },
+          "track_id": {
+            "type": "boolean",
+            "description": "Set to true to include track_id in the response.",
+            "example": true
+          },
+          "track_progress": {
+            "type": "boolean",
+            "description": "Set to true to include track_progress in the response.",
+            "example": true
+          },
+          "track_status": {
+            "type": "boolean",
+            "description": "Set to true to include track_status in the response.",
+            "example": true
+          },
+          "track_title": {
+            "type": "boolean",
+            "description": "Set to true to include track_title in the response.",
+            "example": true
+          },
+          "user_metadata": {
+            "type": "boolean",
+            "description": "Set to true to include user_metadata in the response.",
+            "example": true
+          },
+          "userid": {
+            "type": "boolean",
+            "description": "Set to true to include userid in the response.",
+            "example": true
+          },
+          "range_target": {
+            "type": "string",
+            "description": "Which date field the {from}/{until} path range applies to (e.g., assigned_date, completed_date, created_at).",
+            "example": "completed_date"
+          },
+          "track_filter": {
+            "$ref": "#/components/schemas/ContentFilter"
+          },
+          "user_filter": {
+            "$ref": "#/components/schemas/UserFilter"
+          }
+        }
+      },
+      "UserContentReport": {
+        "type": "object",
+        "description": "Request body for the UserContent endpoint. Set field flags to true to include them in the response; provide filter objects to narrow results.",
+        "properties": {
+          "address": {
+            "type": "boolean",
+            "description": "Set to true to include address in the response.",
+            "example": true
+          },
+          "assignment": {
+            "type": "boolean",
+            "description": "Set to true to include assignment in the response.",
+            "example": true
+          },
+          "buddy_email": {
+            "type": "boolean",
+            "description": "Set to true to include buddy_email in the response.",
+            "example": true
+          },
+          "content": {
+            "type": "boolean",
+            "description": "Set to true to include content in the response.",
+            "example": true
+          },
+          "content_metadata": {
+            "type": "boolean",
+            "description": "Set to true to include content_metadata in the response.",
+            "example": true
+          },
+          "created_at": {
+            "type": "boolean",
+            "description": "Set to true to include created_at in the response.",
+            "example": true
+          },
+          "departments": {
+            "type": "boolean",
+            "description": "Set to true to include departments in the response.",
+            "example": true
+          },
+          "distributor": {
+            "type": "boolean",
+            "description": "Set to true to include distributor in the response.",
+            "example": true
+          },
+          "email": {
+            "type": "boolean",
+            "description": "Set to true to include email in the response.",
+            "example": true
+          },
+          "first_login": {
+            "type": "boolean",
+            "description": "Set to true to include first_login in the response.",
+            "example": true
+          },
+          "first_name": {
+            "type": "boolean",
+            "description": "Set to true to include first_name in the response.",
+            "example": true
+          },
+          "grade": {
+            "type": "boolean",
+            "description": "Set to true to include grade in the response.",
+            "example": true
+          },
+          "group": {
+            "type": "boolean",
+            "description": "Set to true to include group in the response.",
+            "example": true
+          },
+          "groups": {
+            "type": "boolean",
+            "description": "Set to true to include groups in the response.",
+            "example": true
+          },
+          "hired_on": {
+            "type": "boolean",
+            "description": "Set to true to include hired_on in the response.",
+            "example": true
+          },
+          "image": {
+            "type": "boolean",
+            "description": "Set to true to include image in the response.",
+            "example": true
+          },
+          "is_collaborator": {
+            "type": "boolean",
+            "description": "Set to true to include is_collaborator in the response.",
+            "example": true
+          },
+          "is_manager": {
+            "type": "boolean",
+            "description": "Set to true to include is_manager in the response.",
+            "example": true
+          },
+          "is_purchaser": {
+            "type": "boolean",
+            "description": "Set to true to include is_purchaser in the response.",
+            "example": true
+          },
+          "job_title": {
+            "type": "boolean",
+            "description": "Set to true to include job_title in the response.",
+            "example": true
+          },
+          "journey": {
+            "type": "boolean",
+            "description": "Set to true to include journey in the response.",
+            "example": true
+          },
+          "language": {
+            "type": "boolean",
+            "description": "Set to true to include language in the response.",
+            "example": true
+          },
+          "last_login": {
+            "type": "boolean",
+            "description": "Set to true to include last_login in the response.",
+            "example": true
+          },
+          "last_name": {
+            "type": "boolean",
+            "description": "Set to true to include last_name in the response.",
+            "example": true
+          },
+          "locations": {
+            "type": "boolean",
+            "description": "Set to true to include locations in the response.",
+            "example": true
+          },
+          "manager_email": {
+            "type": "boolean",
+            "description": "Set to true to include manager_email in the response.",
+            "example": true
+          },
+          "org_level": {
+            "type": "boolean",
+            "description": "Set to true to include org_level in the response.",
+            "example": true
+          },
+          "partner": {
+            "type": "boolean",
+            "description": "Set to true to include partner in the response.",
+            "example": true
+          },
+          "partner_name": {
+            "type": "boolean",
+            "description": "Set to true to include partner_name in the response.",
+            "example": true
+          },
+          "region": {
+            "type": "boolean",
+            "description": "Set to true to include region in the response.",
+            "example": true
+          },
+          "role": {
+            "type": "boolean",
+            "description": "Set to true to include role in the response.",
+            "example": true
+          },
+          "suspended": {
+            "type": "boolean",
+            "description": "Set to true to include suspended in the response.",
+            "example": true
+          },
+          "suspended_on": {
+            "type": "boolean",
+            "description": "Set to true to include suspended_on in the response.",
+            "example": true
+          },
+          "teams": {
+            "type": "boolean",
+            "description": "Set to true to include teams in the response.",
+            "example": true
+          },
+          "track": {
+            "type": "boolean",
+            "description": "Set to true to include track in the response.",
+            "example": true
+          },
+          "user_metadata": {
+            "type": "boolean",
+            "description": "Set to true to include user_metadata in the response.",
+            "example": true
+          },
+          "userid": {
+            "type": "boolean",
+            "description": "Set to true to include userid in the response.",
+            "example": true
+          },
+          "content_filter": {
+            "$ref": "#/components/schemas/UserContentFilter"
+          },
+          "range_target": {
+            "type": "string",
+            "description": "Which date field the {from}/{until} path range applies to (e.g., assigned_date, completed_date, created_at).",
+            "example": "completed_date"
+          },
+          "sort_by": {
+            "type": "string",
+            "description": "Which field to sort the response by (e.g., updated_date).",
+            "example": "updated_date"
+          },
+          "user_filter": {
+            "$ref": "#/components/schemas/UserFilter"
+          }
+        }
+      },
+      "UserReport": {
+        "type": "object",
+        "description": "Request body for the User endpoint. Set field flags to true to include them in the response; provide filter objects to narrow results.",
+        "properties": {
+          "address": {
+            "type": "boolean",
+            "description": "Set to true to include address in the response.",
+            "example": true
+          },
+          "assignments_completed": {
+            "type": "boolean",
+            "description": "Set to true to include assignments_completed in the response.",
+            "example": true
+          },
+          "assignments_pending": {
+            "type": "boolean",
+            "description": "Set to true to include assignments_pending in the response.",
+            "example": true
+          },
+          "buddy_email": {
+            "type": "boolean",
+            "description": "Set to true to include buddy_email in the response.",
+            "example": true
+          },
+          "comments": {
+            "type": "boolean",
+            "description": "Set to true to include comments in the response.",
+            "example": true
+          },
+          "created_at": {
+            "type": "boolean",
+            "description": "Set to true to include created_at in the response.",
+            "example": true
+          },
+          "departments": {
+            "type": "boolean",
+            "description": "Set to true to include departments in the response.",
+            "example": true
+          },
+          "distributor": {
+            "type": "boolean",
+            "description": "Set to true to include distributor in the response.",
+            "example": true
+          },
+          "email": {
+            "type": "boolean",
+            "description": "Set to true to include email in the response.",
+            "example": true
+          },
+          "first_login": {
+            "type": "boolean",
+            "description": "Set to true to include first_login in the response.",
+            "example": true
+          },
+          "first_name": {
+            "type": "boolean",
+            "description": "Set to true to include first_name in the response.",
+            "example": true
+          },
+          "grade": {
+            "type": "boolean",
+            "description": "Set to true to include grade in the response.",
+            "example": true
+          },
+          "group": {
+            "type": "boolean",
+            "description": "Set to true to include group in the response.",
+            "example": true
+          },
+          "groups": {
+            "type": "boolean",
+            "description": "Set to true to include groups in the response.",
+            "example": true
+          },
+          "hired_on": {
+            "type": "boolean",
+            "description": "Set to true to include hired_on in the response.",
+            "example": true
+          },
+          "image": {
+            "type": "boolean",
+            "description": "Set to true to include image in the response.",
+            "example": true
+          },
+          "is_collaborator": {
+            "type": "boolean",
+            "description": "Set to true to include is_collaborator in the response.",
+            "example": true
+          },
+          "is_manager": {
+            "type": "boolean",
+            "description": "Set to true to include is_manager in the response.",
+            "example": true
+          },
+          "is_purchaser": {
+            "type": "boolean",
+            "description": "Set to true to include is_purchaser in the response.",
+            "example": true
+          },
+          "job_title": {
+            "type": "boolean",
+            "description": "Set to true to include job_title in the response.",
+            "example": true
+          },
+          "language": {
+            "type": "boolean",
+            "description": "Set to true to include language in the response.",
+            "example": true
+          },
+          "last_login": {
+            "type": "boolean",
+            "description": "Set to true to include last_login in the response.",
+            "example": true
+          },
+          "last_name": {
+            "type": "boolean",
+            "description": "Set to true to include last_name in the response.",
+            "example": true
+          },
+          "likes": {
+            "type": "boolean",
+            "description": "Set to true to include likes in the response.",
+            "example": true
+          },
+          "locations": {
+            "type": "boolean",
+            "description": "Set to true to include locations in the response.",
+            "example": true
+          },
+          "manager_email": {
+            "type": "boolean",
+            "description": "Set to true to include manager_email in the response.",
+            "example": true
+          },
+          "org_level": {
+            "type": "boolean",
+            "description": "Set to true to include org_level in the response.",
+            "example": true
+          },
+          "partner": {
+            "type": "boolean",
+            "description": "Set to true to include partner in the response.",
+            "example": true
+          },
+          "partner_name": {
+            "type": "boolean",
+            "description": "Set to true to include partner_name in the response.",
+            "example": true
+          },
+          "ratings": {
+            "type": "boolean",
+            "description": "Set to true to include ratings in the response.",
+            "example": true
+          },
+          "ratings_average": {
+            "type": "boolean",
+            "description": "Set to true to include ratings_average in the response.",
+            "example": true
+          },
+          "region": {
+            "type": "boolean",
+            "description": "Set to true to include region in the response.",
+            "example": true
+          },
+          "role": {
+            "type": "boolean",
+            "description": "Set to true to include role in the response.",
+            "example": true
+          },
+          "seconds_viewed": {
+            "type": "boolean",
+            "description": "Set to true to include seconds_viewed in the response.",
+            "example": true
+          },
+          "sessions": {
+            "type": "boolean",
+            "description": "Set to true to include sessions in the response.",
+            "example": true
+          },
+          "shares": {
+            "type": "boolean",
+            "description": "Set to true to include shares in the response.",
+            "example": true
+          },
+          "suspended": {
+            "type": "boolean",
+            "description": "Set to true to include suspended in the response.",
+            "example": true
+          },
+          "suspended_on": {
+            "type": "boolean",
+            "description": "Set to true to include suspended_on in the response.",
+            "example": true
+          },
+          "teams": {
+            "type": "boolean",
+            "description": "Set to true to include teams in the response.",
+            "example": true
+          },
+          "tracks_completed": {
+            "type": "boolean",
+            "description": "Set to true to include tracks_completed in the response.",
+            "example": true
+          },
+          "tracks_started": {
+            "type": "boolean",
+            "description": "Set to true to include tracks_started in the response.",
+            "example": true
+          },
+          "user_metadata": {
+            "type": "boolean",
+            "description": "Set to true to include user_metadata in the response.",
+            "example": true
+          },
+          "userid": {
+            "type": "boolean",
+            "description": "Set to true to include userid in the response.",
+            "example": true
+          },
+          "views": {
+            "type": "boolean",
+            "description": "Set to true to include views in the response.",
+            "example": true
+          },
+          "workshops_attended": {
+            "type": "boolean",
+            "description": "Set to true to include workshops_attended in the response.",
+            "example": true
+          },
+          "user_filter": {
+            "$ref": "#/components/schemas/UserFilter"
+          }
+        }
+      },
+      "WorkshopEngagementReport": {
+        "type": "object",
+        "description": "Request body for the WorkshopEngagement endpoint. Set field flags to true to include them in the response; provide filter objects to narrow results.",
+        "properties": {
+          "archived": {
+            "type": "boolean",
+            "description": "Set to true to include archived in the response.",
+            "example": true
+          },
+          "canceled_registrations": {
+            "type": "boolean",
+            "description": "Set to true to include canceled_registrations in the response.",
+            "example": true
+          },
+          "host_name": {
+            "type": "boolean",
+            "description": "Set to true to include host_name in the response.",
+            "example": true
+          },
+          "offered_seats": {
+            "type": "boolean",
+            "description": "Set to true to include offered_seats in the response.",
+            "example": true
+          },
+          "registered_seats": {
+            "type": "boolean",
+            "description": "Set to true to include registered_seats in the response.",
+            "example": true
+          },
+          "registration_disabled": {
+            "type": "boolean",
+            "description": "Set to true to include registration_disabled in the response.",
+            "example": true
+          },
+          "total_absentees": {
+            "type": "boolean",
+            "description": "Set to true to include total_absentees in the response.",
+            "example": true
+          },
+          "total_attendees": {
+            "type": "boolean",
+            "description": "Set to true to include total_attendees in the response.",
+            "example": true
+          },
+          "total_waiting": {
+            "type": "boolean",
+            "description": "Set to true to include total_waiting in the response.",
+            "example": true
+          },
+          "waitlist_enabled": {
+            "type": "boolean",
+            "description": "Set to true to include waitlist_enabled in the response.",
+            "example": true
+          },
+          "waitlist_seats": {
+            "type": "boolean",
+            "description": "Set to true to include waitlist_seats in the response.",
+            "example": true
+          },
+          "workshop_duration": {
+            "type": "boolean",
+            "description": "Set to true to include workshop_duration in the response.",
+            "example": true
+          },
+          "workshop_end_date": {
+            "type": "boolean",
+            "description": "Set to true to include workshop_end_date in the response.",
+            "example": true
+          },
+          "workshop_id": {
+            "type": "boolean",
+            "description": "Set to true to include workshop_id in the response.",
+            "example": true
+          },
+          "workshop_instance_id": {
+            "type": "boolean",
+            "description": "Set to true to include workshop_instance_id in the response.",
+            "example": true
+          },
+          "workshop_start_date": {
+            "type": "boolean",
+            "description": "Set to true to include workshop_start_date in the response.",
+            "example": true
+          },
+          "workshop_status": {
+            "type": "boolean",
+            "description": "Set to true to include workshop_status in the response.",
+            "example": true
+          },
+          "workshop_title": {
+            "type": "boolean",
+            "description": "Set to true to include workshop_title in the response.",
+            "example": true
+          },
+          "workshop_filter": {
+            "$ref": "#/components/schemas/ContentFilter"
+          }
+        }
+      },
+      "WorkshopStatusReport": {
+        "type": "object",
+        "description": "Request body for the WorkshopStatus endpoint. Set field flags to true to include them in the response; provide filter objects to narrow results.",
+        "properties": {
+          "address": {
+            "type": "boolean",
+            "description": "Set to true to include address in the response.",
+            "example": true
+          },
+          "buddy_email": {
+            "type": "boolean",
+            "description": "Set to true to include buddy_email in the response.",
+            "example": true
+          },
+          "created_at": {
+            "type": "boolean",
+            "description": "Set to true to include created_at in the response.",
+            "example": true
+          },
+          "departments": {
+            "type": "boolean",
+            "description": "Set to true to include departments in the response.",
+            "example": true
+          },
+          "distributor": {
+            "type": "boolean",
+            "description": "Set to true to include distributor in the response.",
+            "example": true
+          },
+          "email": {
+            "type": "boolean",
+            "description": "Set to true to include email in the response.",
+            "example": true
+          },
+          "first_login": {
+            "type": "boolean",
+            "description": "Set to true to include first_login in the response.",
+            "example": true
+          },
+          "first_name": {
+            "type": "boolean",
+            "description": "Set to true to include first_name in the response.",
+            "example": true
+          },
+          "grade": {
+            "type": "boolean",
+            "description": "Set to true to include grade in the response.",
+            "example": true
+          },
+          "group": {
+            "type": "boolean",
+            "description": "Set to true to include group in the response.",
+            "example": true
+          },
+          "groups": {
+            "type": "boolean",
+            "description": "Set to true to include groups in the response.",
+            "example": true
+          },
+          "hired_on": {
+            "type": "boolean",
+            "description": "Set to true to include hired_on in the response.",
+            "example": true
+          },
+          "image": {
+            "type": "boolean",
+            "description": "Set to true to include image in the response.",
+            "example": true
+          },
+          "is_collaborator": {
+            "type": "boolean",
+            "description": "Set to true to include is_collaborator in the response.",
+            "example": true
+          },
+          "is_manager": {
+            "type": "boolean",
+            "description": "Set to true to include is_manager in the response.",
+            "example": true
+          },
+          "is_purchaser": {
+            "type": "boolean",
+            "description": "Set to true to include is_purchaser in the response.",
+            "example": true
+          },
+          "job_title": {
+            "type": "boolean",
+            "description": "Set to true to include job_title in the response.",
+            "example": true
+          },
+          "language": {
+            "type": "boolean",
+            "description": "Set to true to include language in the response.",
+            "example": true
+          },
+          "last_login": {
+            "type": "boolean",
+            "description": "Set to true to include last_login in the response.",
+            "example": true
+          },
+          "last_name": {
+            "type": "boolean",
+            "description": "Set to true to include last_name in the response.",
+            "example": true
+          },
+          "locations": {
+            "type": "boolean",
+            "description": "Set to true to include locations in the response.",
+            "example": true
+          },
+          "manager_email": {
+            "type": "boolean",
+            "description": "Set to true to include manager_email in the response.",
+            "example": true
+          },
+          "org_level": {
+            "type": "boolean",
+            "description": "Set to true to include org_level in the response.",
+            "example": true
+          },
+          "partner": {
+            "type": "boolean",
+            "description": "Set to true to include partner in the response.",
+            "example": true
+          },
+          "partner_name": {
+            "type": "boolean",
+            "description": "Set to true to include partner_name in the response.",
+            "example": true
+          },
+          "region": {
+            "type": "boolean",
+            "description": "Set to true to include region in the response.",
+            "example": true
+          },
+          "role": {
+            "type": "boolean",
+            "description": "Set to true to include role in the response.",
+            "example": true
+          },
+          "suspended": {
+            "type": "boolean",
+            "description": "Set to true to include suspended in the response.",
+            "example": true
+          },
+          "suspended_on": {
+            "type": "boolean",
+            "description": "Set to true to include suspended_on in the response.",
+            "example": true
+          },
+          "teams": {
+            "type": "boolean",
+            "description": "Set to true to include teams in the response.",
+            "example": true
+          },
+          "user_metadata": {
+            "type": "boolean",
+            "description": "Set to true to include user_metadata in the response.",
+            "example": true
+          },
+          "userid": {
+            "type": "boolean",
+            "description": "Set to true to include userid in the response.",
+            "example": true
+          },
+          "workshop_duration": {
+            "type": "boolean",
+            "description": "Set to true to include workshop_duration in the response.",
+            "example": true
+          },
+          "workshop_end_date": {
+            "type": "boolean",
+            "description": "Set to true to include workshop_end_date in the response.",
+            "example": true
+          },
+          "workshop_id": {
+            "type": "boolean",
+            "description": "Set to true to include workshop_id in the response.",
+            "example": true
+          },
+          "workshop_instance_id": {
+            "type": "boolean",
+            "description": "Set to true to include workshop_instance_id in the response.",
+            "example": true
+          },
+          "workshop_start_date": {
+            "type": "boolean",
+            "description": "Set to true to include workshop_start_date in the response.",
+            "example": true
+          },
+          "workshop_status": {
+            "type": "boolean",
+            "description": "Set to true to include workshop_status in the response.",
+            "example": true
+          },
+          "workshop_title": {
+            "type": "boolean",
+            "description": "Set to true to include workshop_title in the response.",
+            "example": true
+          },
+          "user_filter": {
+            "$ref": "#/components/schemas/UserFilter"
+          },
+          "workshop_filter": {
+            "$ref": "#/components/schemas/ContentFilter"
+          }
+        }
+      }
+    }
+  }
+}
