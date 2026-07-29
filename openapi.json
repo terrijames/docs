@@ -1052,7 +1052,7 @@
   },
   "servers": [
     {
-      "url": "https://usw2-oapi.continu.co/api/v1"
+      "url": "https://usw2-reports.continu.co"
     }
   ],
   "components": {
