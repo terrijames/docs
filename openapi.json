@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Continu Reporting API",
-    "description": "Read-only reporting API for the Continu platform. Pull learning, engagement, assignment, and assessment data into your warehouse, BI, or downstream systems.\n\n**Auth.** Send your API token in the `Authorization` header with a `Bearer` prefix (e.g. `Authorization: Bearer <your-token>`). Tokens have a 30-day TTL and no refresh endpoint — request a new token from your Continu contact on expiry.\n\n**Date ranges.** Path-level `{from}/{until}` parameters are Unix epoch seconds in UTC.\n\n**Request bodies.** Each POST body is a field-selection document: set field flags to `true` to include them in the response, and provide filter objects to narrow results.\n\n**Rate limits.** 50 requests per minute and 5,000 requests per day, both per company across all tokens/integrations. Configurable per-customer on request.",
+    "description": "Read-only reporting API for the Continu platform. Pull learning, engagement, assignment, and assessment data into your warehouse, BI, or downstream systems.\n\n**Auth.** Send your API token in the `Authorization` header with a `Bearer` prefix (e.g. `Authorization: Bearer <your-token>`). Tokens have a 30-day TTL and no refresh endpoint — on expiry, request a new token (an Admin can generate one from the Developer Tools area of your Continu instance).\n\n**Date ranges.** Path-level `{from}/{until}` parameters are Unix epoch seconds in UTC.\n\n**Request bodies.** Each POST body is a field-selection document: set field flags to `true` to include them in the response, and provide filter objects to narrow results.\n\n**Rate limits.** 50 requests per minute and 5,000 requests per day, both per company across all tokens/integrations. Configurable per-customer on request.",
     "version": "1.0",
     "contact": {
       "name": "Continu API Support",
@@ -69,7 +69,7 @@
             "name": "Authorization",
             "in": "header",
             "required": true,
-            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token from your Continu contact on expiry.",
+            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token (an Admin can generate one from the Developer Tools area of your Continu instance) on expiry.",
             "schema": {
               "type": "string"
             }
@@ -145,7 +145,7 @@
             "name": "Authorization",
             "in": "header",
             "required": true,
-            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token from your Continu contact on expiry.",
+            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token (an Admin can generate one from the Developer Tools area of your Continu instance) on expiry.",
             "schema": {
               "type": "string"
             }
@@ -221,7 +221,7 @@
             "name": "Authorization",
             "in": "header",
             "required": true,
-            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token from your Continu contact on expiry.",
+            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token (an Admin can generate one from the Developer Tools area of your Continu instance) on expiry.",
             "schema": {
               "type": "string"
             }
@@ -297,7 +297,7 @@
             "name": "Authorization",
             "in": "header",
             "required": true,
-            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token from your Continu contact on expiry.",
+            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token (an Admin can generate one from the Developer Tools area of your Continu instance) on expiry.",
             "schema": {
               "type": "string"
             }
@@ -373,7 +373,7 @@
             "name": "Authorization",
             "in": "header",
             "required": true,
-            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token from your Continu contact on expiry.",
+            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token (an Admin can generate one from the Developer Tools area of your Continu instance) on expiry.",
             "schema": {
               "type": "string"
             }
@@ -449,7 +449,7 @@
             "name": "Authorization",
             "in": "header",
             "required": true,
-            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token from your Continu contact on expiry.",
+            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token (an Admin can generate one from the Developer Tools area of your Continu instance) on expiry.",
             "schema": {
               "type": "string"
             }
@@ -525,7 +525,7 @@
             "name": "Authorization",
             "in": "header",
             "required": true,
-            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token from your Continu contact on expiry.",
+            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token (an Admin can generate one from the Developer Tools area of your Continu instance) on expiry.",
             "schema": {
               "type": "string"
             }
@@ -583,7 +583,7 @@
             "name": "Authorization",
             "in": "header",
             "required": true,
-            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token from your Continu contact on expiry.",
+            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token (an Admin can generate one from the Developer Tools area of your Continu instance) on expiry.",
             "schema": {
               "type": "string"
             }
@@ -641,7 +641,7 @@
             "name": "Authorization",
             "in": "header",
             "required": true,
-            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token from your Continu contact on expiry.",
+            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token (an Admin can generate one from the Developer Tools area of your Continu instance) on expiry.",
             "schema": {
               "type": "string"
             }
@@ -717,7 +717,7 @@
             "name": "Authorization",
             "in": "header",
             "required": true,
-            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token from your Continu contact on expiry.",
+            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token (an Admin can generate one from the Developer Tools area of your Continu instance) on expiry.",
             "schema": {
               "type": "string"
             }
@@ -793,7 +793,7 @@
             "name": "Authorization",
             "in": "header",
             "required": true,
-            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token from your Continu contact on expiry.",
+            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token (an Admin can generate one from the Developer Tools area of your Continu instance) on expiry.",
             "schema": {
               "type": "string"
             }
@@ -869,7 +869,7 @@
             "name": "Authorization",
             "in": "header",
             "required": true,
-            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token from your Continu contact on expiry.",
+            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token (an Admin can generate one from the Developer Tools area of your Continu instance) on expiry.",
             "schema": {
               "type": "string"
             }
@@ -927,7 +927,7 @@
             "name": "Authorization",
             "in": "header",
             "required": true,
-            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token from your Continu contact on expiry.",
+            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token (an Admin can generate one from the Developer Tools area of your Continu instance) on expiry.",
             "schema": {
               "type": "string"
             }
@@ -1003,7 +1003,7 @@
             "name": "Authorization",
             "in": "header",
             "required": true,
-            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token from your Continu contact on expiry.",
+            "description": "API token with Bearer prefix, e.g. `Bearer <your-token>`. Tokens have a 30-day TTL with no refresh endpoint; request a new token (an Admin can generate one from the Developer Tools area of your Continu instance) on expiry.",
             "schema": {
               "type": "string"
             }
@@ -1061,7 +1061,7 @@
         "type": "apiKey",
         "name": "Authorization",
         "in": "header",
-        "description": "Send as `Bearer <token>`. Tokens have a 30-day TTL with no refresh endpoint; on expiry you'll receive a 401 with message body `\"invalid token TTL Expired, unauthorized request\"` — request a new token from your Continu contact."
+        "description": "Send as `Bearer <token>`. Tokens have a 30-day TTL with no refresh endpoint; on expiry you'll receive a 401 with message body `\"invalid token TTL Expired, unauthorized request\"` — request a new token (an Admin can generate one from the Developer Tools area of your Continu instance)."
       }
     },
     "schemas": {

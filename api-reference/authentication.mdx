@@ -7,7 +7,7 @@ The API uses a bearer token issued by Continu. Tokens have a **30-day TTL** and 
 
 ## Getting a token
 
-Contact your Continu account team. Tokens are issued per organization. Treat the token like a password:
+Tokens are issued per organization. An Admin can generate a token from the Developer Tools area of your Continu instance; your Continu account team can also help if needed. Treat the token like a password:
 
 - Store it in a secret manager (AWS Secrets Manager, GCP Secret Manager, Vault, 1Password, etc.).
 - Never commit it to source control.
@@ -27,7 +27,7 @@ Authorization: Bearer <your-token>
 
 ## Token lifecycle
 
-Tokens carry an embedded expiry — a Unix-seconds timestamp 30 days from issuance. The middleware rejects expired tokens with `HTTP 401` and a specific message body. There is no `/refresh` endpoint, no auto-extension, and no sliding window — once a token expires, you request a new one.
+Tokens carry an embedded expiry — a Unix-seconds timestamp 30 days from issuance. The middleware rejects expired tokens with `HTTP 401` and a specific message body. There is no `/refresh` endpoint, no auto-extension, and no sliding window — once a token expires, you request a new one. Requesting a new token works the same way as obtaining the original, so your integration can automate renewal exactly as it would have automated a refresh.
 
 ### Detecting an expired token
 
@@ -40,7 +40,7 @@ Content-Type: application/json
 {"message": "invalid token TTL Expired, unauthorized request"}
 ```
 
-**Critical detection guidance:** match the message body, not just the status code. Several other 401 conditions return different message strings (missing header, malformed token, insufficient privileges) and are *not* recoverable by re-issuing the token — auto-retrying generic 401s will create an infinite loop.
+**Critical detection guidance:** match the message body, not just the status code. Several other 401 conditions return different message strings (missing header, malformed token, insufficient privileges) and are _not_ recoverable by re-issuing the token — auto-retrying generic 401s will create an infinite loop.
 
 ```python
 import requests
